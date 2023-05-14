@@ -1,0 +1,22 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "key": {
+    "#": {
+      "item": "minecraft:nether_bricks"
+    },
+    "+": {
+      "item": "minecraft:chest"
+    },
+    "@": {
+      "item": "minecraft:blaze_rod"
+    }
+  },
+  "pattern": [
+    "@#@",
+    "#+#",
+    "@#@"
+  ],
+  "result": {
+    "item": "netherchested:nether_chest"
+  }
+}
