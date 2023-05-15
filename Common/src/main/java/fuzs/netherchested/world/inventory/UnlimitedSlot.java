@@ -12,6 +12,6 @@ public class UnlimitedSlot extends Slot {
 
     @Override
     public int getMaxStackSize(ItemStack stack) {
-        return UnlimitedContainerUtils.getMaxStackSize(stack).orElse(super.getMaxStackSize(stack));
+        return UnlimitedContainerUtils.getOptionalMaxStackSize(stack).orElseGet(() -> super.getMaxStackSize(stack));
     }
 }

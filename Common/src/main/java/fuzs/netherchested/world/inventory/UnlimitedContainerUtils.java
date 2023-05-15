@@ -91,11 +91,13 @@ public class UnlimitedContainerUtils {
         return stack.getMaxStackSize() > 1 || !stack.isDamageableItem() || !stack.isDamaged();
     }
 
-    public static OptionalInt getMaxStackSize(ItemStack stack) {
-        if (canIncreaseStackSize(stack)) {
-            return OptionalInt.of(stack.getMaxStackSize() * NetherChested.CONFIG.get(ServerConfig.class).stackSizeMultiplier);
-        }
-        return OptionalInt.empty();
+    public static int getMaxStackSize(ItemStack stack) {
+        return getOptionalMaxStackSize(stack).orElseGet(stack::getMaxStackSize);
+    }
+
+    public static OptionalInt getOptionalMaxStackSize(ItemStack stack) {
+        if (!canIncreaseStackSize(stack)) return OptionalInt.empty();
+        return OptionalInt.of(stack.getMaxStackSize() * NetherChested.CONFIG.get(ServerConfig.class).stackSizeMultiplier);
     }
 
     public static void getQuickCraftSlotCount(Set<Slot> dragSlots, int dragMode, ItemStack stack, int slotStackSize, Slot slot) {
@@ -136,7 +138,7 @@ public class UnlimitedContainerUtils {
             for (int j = 0; j < container.getContainerSize(); ++j) {
                 ItemStack itemStack = container.getItem(j);
                 if (!itemStack.isEmpty()) {
-                    f += (float) itemStack.getCount() / getMaxStackSize(itemStack).orElse(container.getMaxStackSize());
+                    f += (float) itemStack.getCount() / Math.min(container.getMaxStackSize(), getMaxStackSize(itemStack));
                     ++i;
                 }
             }

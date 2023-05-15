@@ -3,6 +3,11 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog].
 
+## [v4.0.3-1.19.2] - 2023-05-15
+### Fixed
+- Fixed hoppers and droppers not interacting correctly with the increased stack size in nether chests
+- Fixed a crash caused by Fabric Api assuming a block state present on chests to be available for the nether chest as well
+
 ## [v4.0.2-1.19.2] - 2023-05-14
 ### Changed
 - Renamed to Nether Chested to be able to work alongside an existing mod named [Nether Chest](https://www.curseforge.com/minecraft/mc-mods/nether-chest-fabric)

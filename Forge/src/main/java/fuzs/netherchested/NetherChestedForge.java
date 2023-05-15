@@ -4,6 +4,7 @@ import fuzs.netherchested.data.ModBlockTagsProvider;
 import fuzs.netherchested.data.ModLanguageProvider;
 import fuzs.netherchested.data.ModLootTableProvider;
 import fuzs.netherchested.data.ModRecipeProvider;
+import fuzs.netherchested.init.ForgeModRegistry;
 import fuzs.puzzleslib.core.CommonFactories;
 import net.minecraft.core.Registry;
 import net.minecraft.data.DataGenerator;
@@ -28,6 +29,7 @@ public class NetherChestedForge {
     @SubscribeEvent
     public static void onConstructMod(final FMLConstructModEvent evt) {
         CommonFactories.INSTANCE.modConstructor(NetherChested.MOD_ID).accept(new NetherChested());
+        ForgeModRegistry.touch();
         registerHandlers();
     }
 
