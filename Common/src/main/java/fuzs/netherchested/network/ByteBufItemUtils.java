@@ -1,4 +1,4 @@
-package fuzs.netherchested.networking;
+package fuzs.netherchested.network;
 
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.item.ItemStack;

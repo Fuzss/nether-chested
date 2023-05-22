@@ -3,7 +3,7 @@ package fuzs.netherchested.world.level.block;
 import fuzs.netherchested.NetherChested;
 import fuzs.netherchested.config.ServerConfig;
 import fuzs.netherchested.init.ModRegistry;
-import fuzs.netherchested.networking.UnlimitedContainerSynchronizer;
+import fuzs.netherchested.network.UnlimitedContainerSynchronizer;
 import fuzs.netherchested.world.inventory.NetherChestMenu;
 import fuzs.netherchested.world.inventory.UnlimitedContainerUtils;
 import fuzs.netherchested.world.level.block.entity.NetherChestBlockEntity;
@@ -24,7 +24,6 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.BlockGetter;
-import net.minecraft.world.level.Explosion;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.EnderChestBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -32,8 +31,9 @@ import net.minecraft.world.level.block.entity.BlockEntityTicker;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.Vec3;
+import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.Nullable;
 import java.util.List;
 import java.util.OptionalInt;
 
@@ -73,7 +73,8 @@ public class NetherChestBlock extends EnderChestBlock {
             BlockPos above = pos.above();
             if (level.dimension() == Level.NETHER && NetherChested.CONFIG.get(ServerConfig.class).explodeInNether) {
                 level.removeBlock(pos, false);
-                level.explode(null, DamageSource.badRespawnPointExplosion(), null, (double) pos.getX() + 0.5D, (double) pos.getY() + 0.5D, (double) pos.getZ() + 0.5D, NetherChested.CONFIG.get(ServerConfig.class).netherExplosionStrength, true, Explosion.BlockInteraction.DESTROY);
+                Vec3 center = pos.getCenter();
+                level.explode(null, DamageSource.badRespawnPointExplosion(center), null, center, NetherChested.CONFIG.get(ServerConfig.class).netherExplosionStrength, true, Level.ExplosionInteraction.BLOCK);
             } else if (!NetherChested.CONFIG.get(ServerConfig.class).noBlockAbove || !level.getBlockState(above).isRedstoneConductor(level, above)) {
                 MenuProvider menuProvider = this.getMenuProvider(state, level, pos);
                 if (menuProvider != null) {

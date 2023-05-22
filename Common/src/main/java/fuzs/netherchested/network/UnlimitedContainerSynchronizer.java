@@ -1,4 +1,4 @@
-package fuzs.netherchested.networking;
+package fuzs.netherchested.network;
 
 import fuzs.netherchested.NetherChested;
 import net.minecraft.core.NonNullList;

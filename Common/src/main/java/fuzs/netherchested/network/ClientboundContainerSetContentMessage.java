@@ -1,6 +1,6 @@
-package fuzs.netherchested.networking;
+package fuzs.netherchested.network;
 
-import fuzs.puzzleslib.network.Message;
+import fuzs.puzzleslib.api.network.v2.MessageV2;
 import net.minecraft.core.NonNullList;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.entity.player.Player;
@@ -8,7 +8,7 @@ import net.minecraft.world.item.ItemStack;
 
 import java.util.List;
 
-public class ClientboundContainerSetContentMessage implements Message<ClientboundContainerSetContentMessage> {
+public class ClientboundContainerSetContentMessage implements MessageV2<ClientboundContainerSetContentMessage> {
     private int containerId;
     private int stateId;
     private List<ItemStack> items;

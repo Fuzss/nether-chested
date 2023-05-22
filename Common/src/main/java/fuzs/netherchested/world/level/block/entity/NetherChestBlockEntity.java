@@ -5,7 +5,7 @@ import fuzs.netherchested.config.ServerConfig;
 import fuzs.netherchested.init.ModRegistry;
 import fuzs.netherchested.world.inventory.NetherChestMenu;
 import fuzs.netherchested.world.inventory.UnlimitedContainerUtils;
-import fuzs.puzzleslib.util.ContainerImpl;
+import fuzs.puzzleslib.api.container.v1.ContainerImpl;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.NonNullList;
 import net.minecraft.nbt.CompoundTag;

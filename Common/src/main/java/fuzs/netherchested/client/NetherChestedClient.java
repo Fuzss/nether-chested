@@ -5,22 +5,29 @@ import fuzs.netherchested.NetherChested;
 import fuzs.netherchested.client.gui.screens.inventory.NetherChestScreen;
 import fuzs.netherchested.init.ModRegistry;
 import fuzs.netherchested.world.level.block.entity.NetherChestBlockEntity;
-import fuzs.puzzleslib.client.core.ClientModConstructor;
-import fuzs.puzzleslib.client.renderer.DynamicBuiltinModelItemRenderer;
+import fuzs.puzzleslib.api.client.core.v1.ClientModConstructor;
+import fuzs.puzzleslib.api.client.core.v1.context.BlockEntityRenderersContext;
+import fuzs.puzzleslib.api.client.core.v1.context.BuildCreativeModeTabContentsContext;
+import fuzs.puzzleslib.api.client.core.v1.context.BuiltinModelItemRendererContext;
+import fuzs.puzzleslib.api.core.v1.context.ModLifecycleContext;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.screens.MenuScreens;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.Sheets;
 import net.minecraft.client.renderer.block.model.ItemTransforms;
 import net.minecraft.client.renderer.blockentity.ChestRenderer;
 import net.minecraft.client.resources.model.Material;
 import net.minecraft.core.BlockPos;
-import net.minecraft.server.packs.resources.ResourceManager;
+import net.minecraft.world.item.CreativeModeTabs;
 import net.minecraft.world.item.ItemStack;
-
-import java.util.Objects;
 
 public class NetherChestedClient implements ClientModConstructor {
     public static final Material NETHER_CHEST_LOCATION = new Material(Sheets.CHEST_SHEET, NetherChested.id("entity/chest/nether"));
+
+    @Override
+    public void onClientSetup(ModLifecycleContext context) {
+        MenuScreens.register(ModRegistry.NETHER_CHEST_MENU_TYPE.get(), NetherChestScreen::new);
+    }
 
     @Override
     public void onRegisterBlockEntityRenderers(BlockEntityRenderersContext context) {
@@ -28,25 +35,17 @@ public class NetherChestedClient implements ClientModConstructor {
     }
 
     @Override
-    public void onRegisterMenuScreens(MenuScreensContext context) {
-        context.registerMenuScreen(ModRegistry.NETHER_CHEST_MENU_TYPE.get(), NetherChestScreen::new);
+    public void onRegisterBuiltinModelItemRenderers(BuiltinModelItemRendererContext context) {
+        NetherChestBlockEntity netherChest = new NetherChestBlockEntity(BlockPos.ZERO, ModRegistry.NETHER_CHEST_BLOCK.get().defaultBlockState());
+        context.registerItemRenderer((ItemStack stack, ItemTransforms.TransformType mode, PoseStack matrices, MultiBufferSource vertexConsumers, int light, int overlay) -> {
+            Minecraft.getInstance().getBlockEntityRenderDispatcher().renderItem(netherChest, matrices, vertexConsumers, light, overlay);
+        }, ModRegistry.NETHER_CHEST_BLOCK.get());
     }
 
     @Override
-    public void onRegisterBuiltinModelItemRenderers(BuiltinModelItemRendererContext context) {
-        context.registerItemRenderer(ModRegistry.NETHER_CHEST_BLOCK.get(), new DynamicBuiltinModelItemRenderer() {
-            private NetherChestBlockEntity netherChest;
-
-            @Override
-            public void renderByItem(ItemStack stack, ItemTransforms.TransformType mode, PoseStack matrices, MultiBufferSource vertexConsumers, int light, int overlay) {
-                Objects.requireNonNull(this.netherChest, "nether chest is null");
-                Minecraft.getInstance().getBlockEntityRenderDispatcher().renderItem(this.netherChest, matrices, vertexConsumers, light, overlay);
-            }
-
-            @Override
-            public void onResourceManagerReload(ResourceManager resourceManager) {
-                this.netherChest = new NetherChestBlockEntity(BlockPos.ZERO, ModRegistry.NETHER_CHEST_BLOCK.get().defaultBlockState());
-            }
+    public void onBuildCreativeModeTabContents(BuildCreativeModeTabContentsContext context) {
+        context.registerBuildListener(CreativeModeTabs.FUNCTIONAL_BLOCKS, (featureFlagSet, output, bl) -> {
+            output.accept(ModRegistry.NETHER_CHEST_ITEM.get());
         });
     }
 }

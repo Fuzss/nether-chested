@@ -1,7 +1,8 @@
-package fuzs.netherchested.networking;
+package fuzs.netherchested.network;
 
-import fuzs.puzzleslib.network.Message;
+import fuzs.puzzleslib.api.network.v2.MessageV2;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.CreativeModeInventoryScreen;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.entity.player.Player;
@@ -9,7 +10,7 @@ import net.minecraft.world.inventory.InventoryMenu;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.ItemStack;
 
-public class ClientboundContainerSetSlotMessage implements Message<ClientboundContainerSetSlotMessage> {
+public class ClientboundContainerSetSlotMessage implements MessageV2<ClientboundContainerSetSlotMessage> {
     private int containerId;
     private int stateId;
     private int slot;
@@ -44,7 +45,7 @@ public class ClientboundContainerSetSlotMessage implements Message<ClientboundCo
 
     @Override
     public MessageHandler<ClientboundContainerSetSlotMessage> makeHandler() {
-        return new MessageHandler<ClientboundContainerSetSlotMessage>() {
+        return new MessageHandler<>() {
 
             @Override
             public void handle(ClientboundContainerSetSlotMessage message, Player player, Object instance) {
@@ -61,8 +62,7 @@ public class ClientboundContainerSetSlotMessage implements Message<ClientboundCo
                 } else {
                     boolean bl = false;
                     if (minecraft.screen instanceof CreativeModeInventoryScreen) {
-                        CreativeModeInventoryScreen creativeModeInventoryScreen = (CreativeModeInventoryScreen)minecraft.screen;
-                        bl = creativeModeInventoryScreen.getSelectedTab() != CreativeModeTab.TAB_INVENTORY.getId();
+                        bl = !((CreativeModeInventoryScreen) minecraft.screen).isInventoryOpen();
                     }
 
                     if (message.getContainerId() == 0 && InventoryMenu.isHotbarSlot(i)) {

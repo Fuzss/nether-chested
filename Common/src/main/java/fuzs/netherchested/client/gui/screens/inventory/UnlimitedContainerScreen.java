@@ -6,7 +6,7 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.datafixers.util.Pair;
 import fuzs.netherchested.NetherChested;
-import fuzs.netherchested.networking.ServerboundContainerClickMessage;
+import fuzs.netherchested.network.client.ServerboundContainerClickMessage;
 import fuzs.netherchested.world.inventory.UnlimitedContainerUtils;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
@@ -222,7 +222,7 @@ public abstract class UnlimitedContainerScreen<T extends AbstractContainerMenu> 
             Pair<ResourceLocation, ResourceLocation> pair = slot.getNoItemIcon();
             if (pair != null) {
                 TextureAtlasSprite textureAtlasSprite = this.minecraft.getTextureAtlas(pair.getFirst()).apply(pair.getSecond());
-                RenderSystem.setShaderTexture(0, textureAtlasSprite.atlas().location());
+                RenderSystem.setShaderTexture(0, textureAtlasSprite.atlasLocation());
                 blit(poseStack, i, j, this.getBlitOffset(), 16, 16, textureAtlasSprite);
                 bl2 = true;
             }

@@ -1,7 +1,7 @@
 package fuzs.netherchested.config;
 
-import fuzs.puzzleslib.config.ConfigCore;
-import fuzs.puzzleslib.config.annotation.Config;
+import fuzs.puzzleslib.api.config.v3.Config;
+import fuzs.puzzleslib.api.config.v3.ConfigCore;
 
 public class ServerConfig implements ConfigCore {
     @Config(description = {"Multiplier for the max stack size for all items placed in a nether chest.", "The stack size of already damaged items cannot be increased."})

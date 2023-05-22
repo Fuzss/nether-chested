@@ -1,7 +1,8 @@
-package fuzs.netherchested.networking;
+package fuzs.netherchested.network.client;
 
 import fuzs.netherchested.NetherChested;
-import fuzs.puzzleslib.network.Message;
+import fuzs.netherchested.network.ByteBufItemUtils;
+import fuzs.puzzleslib.api.network.v2.MessageV2;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMaps;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
@@ -13,7 +14,7 @@ import net.minecraft.world.item.ItemStack;
 
 import java.util.function.IntFunction;
 
-public class ServerboundContainerClickMessage implements Message<ServerboundContainerClickMessage> {
+public class ServerboundContainerClickMessage implements MessageV2<ServerboundContainerClickMessage> {
     private int containerId;
     private int stateId;
     private int slotNum;
@@ -121,7 +122,6 @@ public class ServerboundContainerClickMessage implements Message<ServerboundCont
                             } else {
                                 player.containerMenu.broadcastChanges();
                             }
-
                         }
                     }
                 }

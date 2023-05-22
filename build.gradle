@@ -44,10 +44,6 @@ subprojects {
             url = "https://raw.githubusercontent.com/Fuzss/modresources/main/maven/"
         }
         maven {
-            name = "Progwml6 maven"
-            url = "https://dvs1.progwml6.com/files/maven/"
-        }
-        maven {
             name = "ModMaven"
             url = "https://modmaven.dev"
         }
@@ -66,7 +62,8 @@ subprojects {
     }
 
     tasks.withType(Jar).configureEach {
-        from rootProject.file("LICENSE")
+        from rootProject.file("LICENSE.md")
+        from rootProject.file("LICENSE-ASSETS.md")
         from rootProject.file("CHANGELOG.md")
         manifest {
             attributes([
@@ -94,7 +91,6 @@ subprojects {
     }
 }
 
-import groovy.json.*
 import java.util.regex.Pattern
 
 println('Java: ' + System.getProperty('java.version') + ' JVM: ' + System.getProperty('java.vm.version') + '(' + System.getProperty('java.vendor') + ') Arch: ' + System.getProperty('os.arch'))

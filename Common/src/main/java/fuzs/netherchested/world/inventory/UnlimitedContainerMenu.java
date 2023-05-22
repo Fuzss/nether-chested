@@ -4,7 +4,7 @@ import com.google.common.collect.Sets;
 import net.minecraft.CrashReport;
 import net.minecraft.CrashReportCategory;
 import net.minecraft.ReportedException;
-import net.minecraft.core.Registry;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.Container;
 import net.minecraft.world.entity.SlotAccess;
@@ -44,7 +44,7 @@ public abstract class UnlimitedContainerMenu extends AbstractContainerMenu {
             CrashReportCategory crashReportCategory = crashReport.addCategory("Click info");
             crashReportCategory.setDetail("Menu Type", () -> {
                 Objects.requireNonNull(this.getType(), "menu type is null");
-                return Registry.MENU.getKey(this.getType()).toString();
+                return BuiltInRegistries.MENU.getKey(this.getType()).toString();
             });
             crashReportCategory.setDetail("Menu Class", () -> this.getClass().getCanonicalName());
             crashReportCategory.setDetail("Slot Count", this.slots.size());
