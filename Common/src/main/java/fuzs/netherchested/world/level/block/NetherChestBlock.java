@@ -74,7 +74,7 @@ public class NetherChestBlock extends EnderChestBlock {
             if (level.dimension() == Level.NETHER && NetherChested.CONFIG.get(ServerConfig.class).explodeInNether) {
                 level.removeBlock(pos, false);
                 Vec3 center = pos.getCenter();
-                level.explode(null, DamageSource.badRespawnPointExplosion(center), null, center, NetherChested.CONFIG.get(ServerConfig.class).netherExplosionStrength, true, Level.ExplosionInteraction.BLOCK);
+                level.explode(null, level.damageSources().badRespawnPointExplosion(center), null, center, NetherChested.CONFIG.get(ServerConfig.class).netherExplosionStrength, true, Level.ExplosionInteraction.BLOCK);
             } else if (!NetherChested.CONFIG.get(ServerConfig.class).noBlockAbove || !level.getBlockState(above).isRedstoneConductor(level, above)) {
                 MenuProvider menuProvider = this.getMenuProvider(state, level, pos);
                 if (menuProvider != null) {

@@ -87,13 +87,9 @@ public abstract class UnlimitedContainerScreen<T extends AbstractContainerMenu> 
         this.renderBg(poseStack, partialTick, mouseX, mouseY);
         RenderSystem.disableDepthTest();
 //        super.render(poseStack, mouseX, mouseY, partialTick);
-        PoseStack poseStack2 = RenderSystem.getModelViewStack();
-        poseStack2.pushPose();
-        poseStack2.translate(i, j, 0.0);
-        RenderSystem.applyModelViewMatrix();
-        RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
+        poseStack.pushPose();
+        poseStack.translate(i, j, 0.0);
         this.hoveredSlot = null;
-        RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
 
         for (int k = 0; k < this.menu.slots.size(); ++k) {
             Slot slot = this.menu.slots.get(k);
@@ -106,14 +102,13 @@ public abstract class UnlimitedContainerScreen<T extends AbstractContainerMenu> 
                 this.hoveredSlot = slot;
                 int l = slot.x;
                 int m = slot.y;
-                renderSlotHighlight(poseStack, l, m, this.getBlitOffset());
+                renderSlotHighlight(poseStack, l, m, 0);
             }
         }
 
         this.renderLabels(poseStack, mouseX, mouseY);
         ItemStack itemStack = this.draggingItem.isEmpty() ? this.menu.getCarried() : this.draggingItem;
         if (!itemStack.isEmpty()) {
-            int n = 8;
             int l = this.draggingItem.isEmpty() ? 8 : 16;
             Style string = Style.EMPTY;
             if (!this.draggingItem.isEmpty() && this.isSplittingStack) {
@@ -127,7 +122,7 @@ public abstract class UnlimitedContainerScreen<T extends AbstractContainerMenu> 
                 }
             }
 
-            this.renderFloatingItem(itemStack, mouseX - i - 8, mouseY - j - l, string);
+            this.renderFloatingItem(poseStack, itemStack, mouseX - i - 8, mouseY - j - l, string);
         }
 
         if (!this.snapbackItem.isEmpty()) {
@@ -141,11 +136,10 @@ public abstract class UnlimitedContainerScreen<T extends AbstractContainerMenu> 
             int m = this.snapbackEnd.y - this.snapbackStartY;
             int o = this.snapbackStartX + (int) ((float) l * f);
             int p = this.snapbackStartY + (int) ((float) m * f);
-            this.renderFloatingItem(this.snapbackItem, o, p, Style.EMPTY);
+            this.renderFloatingItem(poseStack, this.snapbackItem, o, p, Style.EMPTY);
         }
 
-        poseStack2.popPose();
-        RenderSystem.applyModelViewMatrix();
+        poseStack.popPose();
         RenderSystem.enableDepthTest();
     }
 
@@ -164,16 +158,12 @@ public abstract class UnlimitedContainerScreen<T extends AbstractContainerMenu> 
         this.renderTooltip(poseStack, tooltipFromItem, itemStack.getTooltipImage(), mouseX, mouseY);
     }
 
-    private void renderFloatingItem(ItemStack stack, int x, int y, Style altText) {
-        PoseStack poseStack = RenderSystem.getModelViewStack();
-        poseStack.translate(0.0, 0.0, 32.0);
-        RenderSystem.applyModelViewMatrix();
-        this.setBlitOffset(200);
-        this.itemRenderer.blitOffset = 200.0F;
-        this.itemRenderer.renderAndDecorateItem(stack, x, y);
-        AdvancedItemRenderer.renderGuiItemDecorations(this.font, stack, x, y - (this.draggingItem.isEmpty() ? 0 : 8), altText);
-        this.setBlitOffset(0);
-        this.itemRenderer.blitOffset = 0.0F;
+    private void renderFloatingItem(PoseStack poseStack, ItemStack itemStack, int i, int j, Style text) {
+        poseStack.pushPose();
+        poseStack.translate(0.0F, 0.0F, 232.0F);
+        this.itemRenderer.renderAndDecorateItem(poseStack, itemStack, i, j);
+        AdvancedItemRenderer.renderGuiItemDecorations(poseStack, this.font, itemStack, i, j - (this.draggingItem.isEmpty() ? 0 : 8), text);
+        poseStack.popPose();
     }
 
     @Override
@@ -216,14 +206,14 @@ public abstract class UnlimitedContainerScreen<T extends AbstractContainerMenu> 
             }
         }
 
-        this.setBlitOffset(100);
-        this.itemRenderer.blitOffset = 100.0F;
+        poseStack.pushPose();
+        poseStack.translate(0.0F, 0.0F, 100.0F);
         if (itemStack.isEmpty() && slot.isActive()) {
             Pair<ResourceLocation, ResourceLocation> pair = slot.getNoItemIcon();
             if (pair != null) {
                 TextureAtlasSprite textureAtlasSprite = this.minecraft.getTextureAtlas(pair.getFirst()).apply(pair.getSecond());
                 RenderSystem.setShaderTexture(0, textureAtlasSprite.atlasLocation());
-                blit(poseStack, i, j, this.getBlitOffset(), 16, 16, textureAtlasSprite);
+                blit(poseStack, i, j, 0, 16, 16, textureAtlasSprite);
                 bl2 = true;
             }
         }
@@ -233,13 +223,11 @@ public abstract class UnlimitedContainerScreen<T extends AbstractContainerMenu> 
                 fill(poseStack, i, j, i + 16, j + 16, -2130706433);
             }
 
-            RenderSystem.enableDepthTest();
-            this.itemRenderer.renderAndDecorateItem(this.minecraft.player, itemStack, i, j, slot.x + slot.y * this.imageWidth);
-            AdvancedItemRenderer.renderGuiItemDecorations(this.font, itemStack, i, j, string);
+            this.itemRenderer.renderAndDecorateItem(poseStack, this.minecraft.player, itemStack, i, j, slot.x + slot.y * this.imageWidth);
+            AdvancedItemRenderer.renderGuiItemDecorations(poseStack, this.font, itemStack, i, j, string);
         }
 
-        this.itemRenderer.blitOffset = 0.0F;
-        this.setBlitOffset(0);
+        poseStack.popPose();
     }
 
     private void recalculateQuickCraftRemaining(Slot slot1) {
@@ -570,16 +558,8 @@ public abstract class UnlimitedContainerScreen<T extends AbstractContainerMenu> 
 
     @Override
     public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
-        if (keyCode == 256 && this.shouldCloseOnEsc()) {
-            this.onClose();
+        if (super.keyPressed(keyCode, scanCode, modifiers)) {
             return true;
-        } else if (keyCode == 258) {
-            boolean bl = !hasShiftDown();
-            if (!this.changeFocus(bl)) {
-                this.changeFocus(bl);
-            }
-
-            return false;
         } else if (this.minecraft.options.keyInventory.matches(keyCode, scanCode)) {
             this.onClose();
             return true;

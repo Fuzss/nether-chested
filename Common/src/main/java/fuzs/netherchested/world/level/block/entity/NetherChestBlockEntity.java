@@ -62,7 +62,7 @@ public class NetherChestBlockEntity extends NamedBlockEntity implements LidBlock
     public final Container container = new ContainerImpl() {
 
         @Override
-        public NonNullList<ItemStack> items() {
+        public NonNullList<ItemStack> getItems() {
             return NetherChestBlockEntity.this.items;
         }
 
