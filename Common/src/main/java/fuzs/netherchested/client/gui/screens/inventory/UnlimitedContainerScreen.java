@@ -110,7 +110,7 @@ public abstract class UnlimitedContainerScreen<T extends AbstractContainerMenu> 
         ItemStack itemStack = this.draggingItem.isEmpty() ? this.menu.getCarried() : this.draggingItem;
         if (!itemStack.isEmpty()) {
             int l = this.draggingItem.isEmpty() ? 8 : 16;
-            Style string = Style.EMPTY;
+            String string = null;
             if (!this.draggingItem.isEmpty() && this.isSplittingStack) {
                 itemStack = itemStack.copy();
                 itemStack.setCount(Mth.ceil((float) itemStack.getCount() / 2.0F));
@@ -118,7 +118,7 @@ public abstract class UnlimitedContainerScreen<T extends AbstractContainerMenu> 
                 itemStack = itemStack.copy();
                 itemStack.setCount(this.quickCraftingRemainder);
                 if (itemStack.isEmpty()) {
-                    string = string.withColor(ChatFormatting.YELLOW);
+                    string = ChatFormatting.YELLOW + "0";
                 }
             }
 
@@ -136,7 +136,7 @@ public abstract class UnlimitedContainerScreen<T extends AbstractContainerMenu> 
             int m = this.snapbackEnd.y - this.snapbackStartY;
             int o = this.snapbackStartX + (int) ((float) l * f);
             int p = this.snapbackStartY + (int) ((float) m * f);
-            this.renderFloatingItem(poseStack, this.snapbackItem, o, p, Style.EMPTY);
+            this.renderFloatingItem(poseStack, this.snapbackItem, o, p, null);
         }
 
         poseStack.popPose();
@@ -158,7 +158,7 @@ public abstract class UnlimitedContainerScreen<T extends AbstractContainerMenu> 
         this.renderTooltip(poseStack, tooltipFromItem, itemStack.getTooltipImage(), mouseX, mouseY);
     }
 
-    private void renderFloatingItem(PoseStack poseStack, ItemStack itemStack, int i, int j, Style text) {
+    private void renderFloatingItem(PoseStack poseStack, ItemStack itemStack, int i, int j, String text) {
         poseStack.pushPose();
         poseStack.translate(0.0F, 0.0F, 232.0F);
         this.itemRenderer.renderAndDecorateItem(poseStack, itemStack, i, j);
@@ -182,7 +182,7 @@ public abstract class UnlimitedContainerScreen<T extends AbstractContainerMenu> 
         boolean bl = false;
         boolean bl2 = slot == this.clickedSlot && !this.draggingItem.isEmpty() && !this.isSplittingStack;
         ItemStack itemStack2 = this.menu.getCarried();
-        Style string = Style.EMPTY;
+        String string = null;
         if (slot == this.clickedSlot && !this.draggingItem.isEmpty() && this.isSplittingStack && !itemStack.isEmpty()) {
             itemStack = itemStack.copy();
             itemStack.setCount(itemStack.getCount() / 2);
@@ -197,7 +197,7 @@ public abstract class UnlimitedContainerScreen<T extends AbstractContainerMenu> 
                 UnlimitedContainerUtils.getQuickCraftSlotCount(this.quickCraftSlots, this.quickCraftingType, itemStack, slot.getItem().isEmpty() ? 0 : slot.getItem().getCount(), slot);
                 int k = slot.getMaxStackSize(itemStack);
                 if (itemStack.getCount() > k) {
-                    string = string.withColor(ChatFormatting.YELLOW);
+                    string = ChatFormatting.YELLOW.toString() + k;
                     itemStack.setCount(k);
                 }
             } else {

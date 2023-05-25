@@ -14,11 +14,9 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.Style;
 import net.minecraft.util.Mth;
 import net.minecraft.world.item.ItemStack;
+import org.jetbrains.annotations.Nullable;
 
-import java.util.Locale;
-import java.util.Map;
-import java.util.NavigableMap;
-import java.util.Optional;
+import java.util.*;
 import java.util.regex.Pattern;
 
 public class AdvancedItemRenderer {
@@ -59,21 +57,24 @@ public class AdvancedItemRenderer {
     /**
      * Pretty much copied from {@link net.minecraft.client.renderer.entity.ItemRenderer#renderGuiItemDecorations(PoseStack, Font, ItemStack, int, int, String)}
      */
-    public static void renderGuiItemDecorations(PoseStack poseStack, Font fr, ItemStack stack, int xPosition, int yPosition, Style style) {
+    public static void renderGuiItemDecorations(PoseStack poseStack, Font fr, ItemStack stack, int xPosition, int yPosition, @Nullable String text) {
         if (!stack.isEmpty()) {
             poseStack.pushPose();
-            if (stack.getCount() != 1 || !style.isEmpty()) {
-                Component string = Component.literal(shortenValue(stack.getCount())).withStyle(style);
+            if (stack.getCount() != 1 || text != null) {
+
+                String value = shortenValue(getCountFromString(text).orElse(stack.getCount()));
+                Style style = getStyleFromString(text);
+                Component stackCount = Component.literal(value).withStyle(style);
 
                 poseStack.translate(0.0, 0.0, 200.0F);
 
-                float scale = Math.min(1.0F, 16.0F / fr.width(string));
+                float scale = Math.min(1.0F, 16.0F / fr.width(stackCount));
                 poseStack.scale(scale, scale, 1.0F);
 
                 MultiBufferSource.BufferSource bufferSource = MultiBufferSource.immediate(Tesselator.getInstance().getBuilder());
-                float posX = (xPosition + 17) / scale - fr.width(string);
+                float posX = (xPosition + 17) / scale - fr.width(stackCount);
                 float posY = (yPosition + fr.lineHeight * 2) / scale - fr.lineHeight;
-                fr.drawInBatch(string, posX, posY, 16777215, true, poseStack.last().pose(), bufferSource, Font.DisplayMode.NORMAL, 0, 15728880);
+                fr.drawInBatch(stackCount, posX, posY, 16777215, true, poseStack.last().pose(), bufferSource, Font.DisplayMode.NORMAL, 0, 15728880);
                 bufferSource.endBatch();
             }
 
@@ -100,5 +101,43 @@ public class AdvancedItemRenderer {
 
             poseStack.popPose();
         }
+    }
+
+    private static OptionalInt getCountFromString(@Nullable String text) {
+        if (text != null) {
+            try {
+                text = ChatFormatting.stripFormatting(text);
+                if (text != null) {
+                    return OptionalInt.of(Integer.parseInt(text));
+                }
+            } catch (NumberFormatException ignored) {
+
+            }
+        }
+        return OptionalInt.empty();
+    }
+
+    private static Style getStyleFromString(@Nullable String text) {
+        Style style = Style.EMPTY;
+        if (text != null) {
+            char[] charArray = text.toCharArray();
+            for (int i = 0; i < charArray.length; i++) {
+                char c = charArray[i];
+                if (c == ChatFormatting.PREFIX_CODE) {
+                    if (++i >= charArray.length) {
+                        break;
+                    } else {
+                        c = charArray[i];
+                        ChatFormatting chatFormatting = ChatFormatting.getByCode(c);
+                        if (chatFormatting == ChatFormatting.RESET) {
+                            style = Style.EMPTY;
+                        } else if (chatFormatting != null) {
+                            style = style.applyLegacyFormat(chatFormatting);
+                        }
+                    }
+                }
+            }
+        }
+        return style;
     }
 }
