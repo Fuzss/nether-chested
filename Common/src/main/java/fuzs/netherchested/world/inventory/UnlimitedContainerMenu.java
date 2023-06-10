@@ -1,26 +1,15 @@
 package fuzs.netherchested.world.inventory;
 
-import com.google.common.collect.Sets;
-import net.minecraft.CrashReport;
-import net.minecraft.CrashReportCategory;
-import net.minecraft.ReportedException;
-import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.Container;
-import net.minecraft.world.entity.SlotAccess;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.*;
 import net.minecraft.world.item.ItemStack;
 
-import java.util.Objects;
 import java.util.Optional;
-import java.util.Set;
 
 public abstract class UnlimitedContainerMenu extends AbstractContainerMenu {
-    private final Set<Slot> quickcraftSlots = Sets.newHashSet();
-    private int quickcraftType = -1;
-    private int quickcraftStatus;
 
     public UnlimitedContainerMenu(MenuType<?> menuType, int containerId) {
         super(menuType, containerId);
@@ -36,26 +25,7 @@ public abstract class UnlimitedContainerMenu extends AbstractContainerMenu {
     }
 
     @Override
-    public void clicked(int mouseX, int mouseY, ClickType clickType, Player player) {
-        try {
-            this.doClick(mouseX, mouseY, clickType, player);
-        } catch (Exception var8) {
-            CrashReport crashReport = CrashReport.forThrowable(var8, "Container click");
-            CrashReportCategory crashReportCategory = crashReport.addCategory("Click info");
-            crashReportCategory.setDetail("Menu Type", () -> {
-                Objects.requireNonNull(this.getType(), "menu type is null");
-                return BuiltInRegistries.MENU.getKey(this.getType()).toString();
-            });
-            crashReportCategory.setDetail("Menu Class", () -> this.getClass().getCanonicalName());
-            crashReportCategory.setDetail("Slot Count", this.slots.size());
-            crashReportCategory.setDetail("Slot", mouseX);
-            crashReportCategory.setDetail("Button", mouseY);
-            crashReportCategory.setDetail("Type", clickType);
-            throw new ReportedException(crashReport);
-        }
-    }
-
-    private void doClick(int mouseX, int mouseY, ClickType clickType, Player player) {
+    protected void doClick(int mouseX, int mouseY, ClickType clickType, Player player) {
         Inventory inventory = player.getInventory();
         if (clickType == ClickType.QUICK_CRAFT) {
             int i = this.quickcraftStatus;
@@ -151,7 +121,7 @@ public abstract class UnlimitedContainerMenu extends AbstractContainerMenu {
                 ItemStack itemStack = slot.getItem();
                 ItemStack itemStack5 = this.getCarried();
                 player.updateTutorialInventoryAction(itemStack5, slot.getItem(), clickAction);
-                if (!itemStack5.overrideStackedOnOther(slot, clickAction, player) && !itemStack.overrideOtherStackedOnMe(itemStack5, slot, clickAction, player, this.createCarriedSlotAccess())) {
+                if (!this.tryItemClickBehaviourOverride(player, clickAction, slot, itemStack, itemStack5)) {
                     if (itemStack.isEmpty()) {
                         if (!itemStack5.isEmpty()) {
                             int n = clickAction == ClickAction.PRIMARY ? itemStack5.getCount() : 1;
@@ -286,28 +256,6 @@ public abstract class UnlimitedContainerMenu extends AbstractContainerMenu {
                 UnlimitedContainerUtils.placeItemBackInPlayerInventory(player, container.removeItemNoUpdate(i));
             }
         }
-    }
-
-    @Override
-    protected void resetQuickCraft() {
-        this.quickcraftStatus = 0;
-        this.quickcraftSlots.clear();
-    }
-
-    private SlotAccess createCarriedSlotAccess() {
-        return new SlotAccess() {
-
-            @Override
-            public ItemStack get() {
-                return UnlimitedContainerMenu.this.getCarried();
-            }
-
-            @Override
-            public boolean set(ItemStack carried) {
-                UnlimitedContainerMenu.this.setCarried(carried);
-                return true;
-            }
-        };
     }
 
     @Override

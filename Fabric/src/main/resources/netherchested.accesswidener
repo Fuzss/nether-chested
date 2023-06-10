@@ -1,4 +1,9 @@
 accessWidener	v2	named
+accessible  field   net/minecraft/world/inventory/AbstractContainerMenu quickcraftType  I
+accessible  field   net/minecraft/world/inventory/AbstractContainerMenu quickcraftStatus    I
+accessible  field   net/minecraft/world/inventory/AbstractContainerMenu quickcraftSlots Ljava/util/Set;
+extendable  method  net/minecraft/world/inventory/AbstractContainerMenu doClick (IILnet/minecraft/world/inventory/ClickType;Lnet/minecraft/world/entity/player/Player;)V
+extendable  method  net/minecraft/world/inventory/AbstractContainerMenu tryItemClickBehaviourOverride   (Lnet/minecraft/world/entity/player/Player;Lnet/minecraft/world/inventory/ClickAction;Lnet/minecraft/world/inventory/Slot;Lnet/minecraft/world/item/ItemStack;Lnet/minecraft/world/item/ItemStack;)Z
 accessible  field   net/minecraft/client/gui/screens/inventory/AbstractContainerScreen  clickedSlot    Lnet/minecraft/world/inventory/Slot;
 accessible  field   net/minecraft/client/gui/screens/inventory/AbstractContainerScreen  snapbackEnd    Lnet/minecraft/world/inventory/Slot;
 accessible  field   net/minecraft/client/gui/screens/inventory/AbstractContainerScreen  quickdropSlot  Lnet/minecraft/world/inventory/Slot;
