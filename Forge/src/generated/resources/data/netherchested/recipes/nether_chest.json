@@ -19,5 +19,6 @@
   ],
   "result": {
     "item": "netherchested:nether_chest"
-  }
+  },
+  "show_notification": true
 }

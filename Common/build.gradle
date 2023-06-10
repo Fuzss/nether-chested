@@ -1,25 +1,24 @@
-plugins {
-    id 'fabric-loom' version '1.0.+'
-    id 'io.github.juuxel.loom-quiltflower' version '1.+'
-}
+apply plugin: 'fabric-loom'
+apply plugin: 'io.github.juuxel.loom-quiltflower'
 
 archivesBaseName = rootProject.name
-version = "v${modVersion}-${minecraftVersion}-Common"
+version = "v${modVersion}-${libs.versions.minecraft.get()}-Common"
 group = modMavenGroup
 
 dependencies {
-    // Minecraft
-    minecraft "com.mojang:minecraft:${minecraftVersion}"
+    minecraft "com.mojang:minecraft:${libs.versions.minecraft.get()}"
     mappings loom.layered() {
         officialMojangMappings()
-//        parchment("org.parchmentmc.data:parchment-${minecraftVersion}:${parchmentMappingsVersion}@zip")
+        parchment("org.parchmentmc.data:parchment-${libs.versions.parchmentMinecraft.get()}:${libs.versions.parchment.get()}@zip")
     }
 
     // Puzzles Lib
-    modApi "fuzs.puzzleslib:puzzleslib-common:${puzzlesVersion}"
+    modApi ("fuzs.puzzleslib:puzzleslib-common:${libs.versions.puzzles.get()}")
 }
 
 loom {
+    accessWidenerPath = project(":Fabric").file("src/main/resources/${modId}.accesswidener")
+
     mixin {
         // not sure if this is necessary for common...
         defaultRefmapName = "${modId}.refmap.json"
@@ -45,26 +44,68 @@ loom {
 }
 
 processResources {
+    from(project(":Fabric").sourceSets.main.resources) {
+        include("fabric.mod.json")
+        include("${modId}.accesswidener")
+    }
+
     duplicatesStrategy DuplicatesStrategy.INCLUDE
 
     // this will ensure that this task is redone when a value changes
-    inputs.property "modDescription", 			"${modDescription}"
-    inputs.property "resourcePackFormat",       "${resourcePackFormat}"
-    inputs.property "dataPackFormat", 			"${dataPackFormat}"
+    inputs.property "modId", modId
+    inputs.property "modName", modName
+    inputs.property "modVersion", modVersion
+    inputs.property "modDescription", modDescription
+    inputs.property "modGroup", project.group
+    inputs.property "modPageUrl", modSourceUrl
+    inputs.property "modIssueUrl", modIssueUrl
+    inputs.property "modAuthor", modAuthor
+    inputs.property "modLicense", modLicense
+    inputs.property "minFabricVersion", libs.versions.minFabric.get()
+    inputs.property "minFabricApiVersion", libs.versions.minFabricApi.get()
+    inputs.property "minecraftVersion", libs.versions.minecraft.get()
+    inputs.property "minPuzzlesVersion", libs.versions.minPuzzles.get()
+    inputs.property "resourcePackFormat", libs.versions.resources.get()
+    inputs.property "dataPackFormat", libs.versions.data.get()
+    inputs.property "mainEntryPoint", "${project.group}.${rootProject.name}Fabric"
+    inputs.property "clientEntryPoint", "${project.group}.client.${rootProject.name}FabricClient"
+    inputs.property "modFabricEnvironment", modFabricEnvironment
+
+    // replace stuff in fabric.mod.json
+    filesMatching('fabric.mod.json') {
+        expand(
+                'modId': modId,
+                'modName': modName,
+                'modVersion': modVersion,
+                'modDescription': modDescription,
+                'modGroup': project.group,
+                'modPageUrl': modSourceUrl,
+                'modIssueUrl': modIssueUrl,
+                'modAuthor': modAuthor,
+                'modLicense': modLicense,
+                'minFabricVersion': libs.versions.minFabric.get(),
+                'minFabricApiVersion': libs.versions.minFabricApi.get(),
+                'minecraftVersion': libs.versions.minecraft.get(),
+                "minPuzzlesVersion": libs.versions.minPuzzles.get(),
+                "mainEntryPoint": "${project.group}.${rootProject.name}Fabric",
+                "clientEntryPoint": "${project.group}.client.${rootProject.name}FabricClient",
+                "modFabricEnvironment": modFabricEnvironment
+        )
+    }
 
     // replace stuff in pack.mcmeta
-    filesMatching ('pack.mcmeta') {
-        expand (
-                'modDescription':       "${modDescription}",
-                "resourcePackFormat":   "${resourcePackFormat}",
-                "dataPackFormat":       "${dataPackFormat}"
+    filesMatching('pack.mcmeta') {
+        expand(
+                'modDescription': modDescription,
+                "resourcePackFormat": libs.versions.resources.get(),
+                "dataPackFormat": libs.versions.data.get()
         )
     }
 }
 
 publishing {
     publications {
-        mavenJava (MavenPublication) {
+        mavenJava(MavenPublication) {
             artifactId = "${modId}-common"
             version = modVersion
             from components.java
@@ -83,8 +124,8 @@ publishing {
                 }
                 licenses {
                     license {
-                        name = 'MPL-2'
-                        url = 'https://www.mozilla.org/en-US/MPL/2.0/'
+                        name = "${modLicense}"
+                        url = "https://spdx.org/licenses/${modLicense}.html"
                     }
                 }
                 developers {

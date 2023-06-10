@@ -1,7 +1,6 @@
 package fuzs.netherchested.client;
 
 import com.mojang.blaze3d.vertex.PoseStack;
-import fuzs.netherchested.NetherChested;
 import fuzs.netherchested.client.gui.screens.inventory.NetherChestScreen;
 import fuzs.netherchested.init.ModRegistry;
 import fuzs.netherchested.world.level.block.entity.NetherChestBlockEntity;
@@ -13,16 +12,13 @@ import fuzs.puzzleslib.api.core.v1.context.ModLifecycleContext;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.MenuScreens;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.Sheets;
 import net.minecraft.client.renderer.blockentity.ChestRenderer;
-import net.minecraft.client.resources.model.Material;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.item.CreativeModeTabs;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 
 public class NetherChestedClient implements ClientModConstructor {
-    public static final Material NETHER_CHEST_LOCATION = new Material(Sheets.CHEST_SHEET, NetherChested.id("entity/chest/nether"));
 
     @Override
     public void onClientSetup(ModLifecycleContext context) {

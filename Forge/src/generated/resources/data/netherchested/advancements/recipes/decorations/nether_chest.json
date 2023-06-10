@@ -30,5 +30,6 @@
     "recipes": [
       "netherchested:nether_chest"
     ]
-  }
+  },
+  "sends_telemetry_event": false
 }

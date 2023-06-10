@@ -139,7 +139,7 @@ public abstract class UnlimitedContainerMenu extends AbstractContainerMenu {
 
                 ItemStack itemStack = this.quickMoveStack(player, mouseX);
 
-                while (!itemStack.isEmpty() && ItemStack.isSame(slot.getItem(), itemStack)) {
+                while (!itemStack.isEmpty() && ItemStack.isSameItem(slot.getItem(), itemStack)) {
                     itemStack = this.quickMoveStack(player, mouseX);
                 }
             } else {

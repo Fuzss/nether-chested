@@ -1,15 +1,12 @@
 package fuzs.netherchested.client.gui.screens.inventory;
 
 import com.google.common.collect.ImmutableSortedMap;
-import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.vertex.Tesselator;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiComponent;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.player.LocalPlayer;
-import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.Style;
 import net.minecraft.util.Mth;
@@ -55,51 +52,44 @@ public class AdvancedItemRenderer {
     }
 
     /**
-     * Pretty much copied from {@link net.minecraft.client.renderer.entity.ItemRenderer#renderGuiItemDecorations(PoseStack, Font, ItemStack, int, int, String)}
+     * Pretty much copied from {@link GuiGraphics#renderItemDecorations(Font, ItemStack, int, int, String)}.
      */
-    public static void renderGuiItemDecorations(PoseStack poseStack, Font fr, ItemStack stack, int xPosition, int yPosition, @Nullable String text) {
-        if (!stack.isEmpty()) {
-            poseStack.pushPose();
-            if (stack.getCount() != 1 || text != null) {
-
-                String value = shortenValue(getCountFromString(text).orElse(stack.getCount()));
-                Style style = getStyleFromString(text);
-                Component stackCount = Component.literal(value).withStyle(style);
-
-                poseStack.translate(0.0, 0.0, 200.0F);
-
-                float scale = Math.min(1.0F, 16.0F / fr.width(stackCount));
-                poseStack.scale(scale, scale, 1.0F);
-
-                MultiBufferSource.BufferSource bufferSource = MultiBufferSource.immediate(Tesselator.getInstance().getBuilder());
-                float posX = (xPosition + 17) / scale - fr.width(stackCount);
-                float posY = (yPosition + fr.lineHeight * 2) / scale - fr.lineHeight;
-                fr.drawInBatch(stackCount, posX, posY, 16777215, true, poseStack.last().pose(), bufferSource, Font.DisplayMode.NORMAL, 0, 15728880);
-                bufferSource.endBatch();
+    public static void renderItemDecorations(GuiGraphics guiGraphics, Font font, ItemStack itemStack, int i, int j, @Nullable String string) {
+        if (!itemStack.isEmpty()) {
+            guiGraphics.pose().pushPose();
+            if (itemStack.getCount() != 1 || string != null) {
+                String string2 = shortenValue(getCountFromString(string).orElse(itemStack.getCount()));
+                Style style = getStyleFromString(string);
+                Component stackCount = Component.literal(string2).withStyle(style);
+                guiGraphics.pose().translate(0.0F, 0.0F, 200.0F);
+                float scale = Math.min(1.0F, 16.0F / font.width(stackCount));
+                guiGraphics.pose().scale(scale, scale, 1.0F);
+                int posX = (int) ((i + 17) / scale - font.width(stackCount));
+                int posY = (int) ((j + font.lineHeight * 2) / scale - font.lineHeight);
+                guiGraphics.drawString(font, string2, posX, posY, 16777215, true);
             }
 
-            if (stack.isBarVisible()) {
-                RenderSystem.disableDepthTest();
-                int k = stack.getBarWidth();
-                int j = stack.getBarColor();
-                int m = xPosition + 2;
-                int n = yPosition + 13;
-                GuiComponent.fill(poseStack, m, n, m + 13, n + 2, -16777216);
-                GuiComponent.fill(poseStack, m, n, m + k, n + 1, j | -16777216);
-                RenderSystem.enableDepthTest();
+            int m;
+            int n;
+            if (itemStack.isBarVisible()) {
+                int k = itemStack.getBarWidth();
+                int l = itemStack.getBarColor();
+                m = i + 2;
+                n = j + 13;
+                guiGraphics.fill(RenderType.guiOverlay(), m, n, m + 13, n + 2, -16777216);
+                guiGraphics.fill(RenderType.guiOverlay(), m, n, m + k, n + 1, l | -16777216);
             }
 
-            LocalPlayer localPlayer = Minecraft.getInstance().player;
-            float f = localPlayer == null ? 0.0F : localPlayer.getCooldowns().getCooldownPercent(stack.getItem(), Minecraft.getInstance().getFrameTime());
+            Minecraft minecraft = Minecraft.getInstance();
+            LocalPlayer localPlayer = minecraft.player;
+            float f = localPlayer == null ? 0.0F : localPlayer.getCooldowns().getCooldownPercent(itemStack.getItem(), minecraft.getFrameTime());
             if (f > 0.0F) {
-                RenderSystem.disableDepthTest();
-                int m = yPosition + Mth.floor(16.0F * (1.0F - f));
-                int n = m + Mth.ceil(16.0F * f);
-                GuiComponent.fill(poseStack, xPosition, m, xPosition + 16, n, Integer.MAX_VALUE);
-                RenderSystem.enableDepthTest();
+                m = j + Mth.floor(16.0F * (1.0F - f));
+                n = m + Mth.ceil(16.0F * f);
+                guiGraphics.fill(RenderType.guiOverlay(), i, m, i + 16, n, Integer.MAX_VALUE);
             }
 
-            poseStack.popPose();
+            guiGraphics.pose().popPose();
         }
     }
 

@@ -1,6 +1,6 @@
 package fuzs.netherchested.mixin.client;
 
-import fuzs.netherchested.client.NetherChestedClient;
+import fuzs.netherchested.network.ClientboundContainerSetContentMessage;
 import fuzs.netherchested.world.level.block.entity.NetherChestBlockEntity;
 import net.minecraft.client.renderer.Sheets;
 import net.minecraft.client.resources.model.Material;
@@ -19,11 +19,11 @@ abstract class SheetsMixin {
 
     @Inject(method = "getAllMaterials", at = @At("TAIL"))
     private static void getAllMaterials(Consumer<Material> materialConsumer, CallbackInfo callback) {
-        materialConsumer.accept(NetherChestedClient.NETHER_CHEST_LOCATION);
+        materialConsumer.accept(ClientboundContainerSetContentMessage.NETHER_CHEST_LOCATION);
     }
 
     @Inject(method = "chooseMaterial", at = @At("HEAD"), cancellable = true)
     private static void chooseMaterial(BlockEntity blockEntity, ChestType chestType, boolean holiday, CallbackInfoReturnable<Material> callback) {
-        if (blockEntity instanceof NetherChestBlockEntity) callback.setReturnValue(NetherChestedClient.NETHER_CHEST_LOCATION);
+        if (blockEntity instanceof NetherChestBlockEntity) callback.setReturnValue(ClientboundContainerSetContentMessage.NETHER_CHEST_LOCATION);
     }
 }
