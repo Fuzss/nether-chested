@@ -1,9 +1,6 @@
 package fuzs.netherchested.network;
 
-import fuzs.netherchested.NetherChested;
 import fuzs.puzzleslib.api.network.v2.MessageV2;
-import net.minecraft.client.renderer.Sheets;
-import net.minecraft.client.resources.model.Material;
 import net.minecraft.core.NonNullList;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.entity.player.Player;
@@ -12,7 +9,6 @@ import net.minecraft.world.item.ItemStack;
 import java.util.List;
 
 public class ClientboundContainerSetContentMessage implements MessageV2<ClientboundContainerSetContentMessage> {
-    public static final Material NETHER_CHEST_LOCATION = new Material(Sheets.CHEST_SHEET, NetherChested.id("entity/chest/nether"));
     private int containerId;
     private int stateId;
     private List<ItemStack> items;
