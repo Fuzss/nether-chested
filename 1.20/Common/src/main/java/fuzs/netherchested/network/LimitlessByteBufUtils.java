@@ -3,7 +3,7 @@ package fuzs.netherchested.network;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.item.ItemStack;
 
-public class ByteBufItemUtils {
+public class LimitlessByteBufUtils {
 
     public static ItemStack readItem(FriendlyByteBuf friendlyByteBuf) {
         ItemStack stack = friendlyByteBuf.readItem();

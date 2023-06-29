@@ -34,16 +34,16 @@ public class ClientboundContainerSetContentMessage implements MessageV2<Clientbo
     public void read(FriendlyByteBuf friendlyByteBuf) {
         this.containerId = friendlyByteBuf.readUnsignedByte();
         this.stateId = friendlyByteBuf.readVarInt();
-        this.items = friendlyByteBuf.readCollection(NonNullList::createWithCapacity, ByteBufItemUtils::readItem);
-        this.carriedItem = ByteBufItemUtils.readItem(friendlyByteBuf);
+        this.items = friendlyByteBuf.readCollection(NonNullList::createWithCapacity, LimitlessByteBufUtils::readItem);
+        this.carriedItem = LimitlessByteBufUtils.readItem(friendlyByteBuf);
     }
 
     @Override
     public void write(FriendlyByteBuf buffer) {
         buffer.writeByte(this.containerId);
         buffer.writeVarInt(this.stateId);
-        buffer.writeCollection(this.items, ByteBufItemUtils::writeItem);
-        ByteBufItemUtils.writeItem(buffer, this.carriedItem);
+        buffer.writeCollection(this.items, LimitlessByteBufUtils::writeItem);
+        LimitlessByteBufUtils.writeItem(buffer, this.carriedItem);
     }
 
     @Override

@@ -19,6 +19,9 @@ dependencies {
     // Extensible Enums
 //    modApi(include(libs.extensibleenums.fabric.get()))
 
+    // Puzzles Access Api
+    modApi(include("fuzs.puzzlesaccessapi:puzzlesaccessapi-fabric:8.0.2"))
+
     // Quality of Life Mods
     versionCatalog.findLibrary("modmenu.fabric").ifPresent {
         modLocalRuntime(it)
@@ -26,8 +29,4 @@ dependencies {
     versionCatalog.findLibrary("forgeconfigscreens.fabric").ifPresent {
         modLocalRuntime(it)
     }
-}
-
-loom {
-    accessWidenerPath = file("src/main/resources/${modId}.accesswidener")
 }

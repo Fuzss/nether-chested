@@ -2,12 +2,10 @@ package fuzs.netherchested.network;
 
 import fuzs.puzzleslib.api.network.v2.MessageV2;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.CreativeModeInventoryScreen;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.InventoryMenu;
-import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.ItemStack;
 
 public class ClientboundContainerSetSlotMessage implements MessageV2<ClientboundContainerSetSlotMessage> {
@@ -32,7 +30,7 @@ public class ClientboundContainerSetSlotMessage implements MessageV2<Clientbound
         this.containerId = friendlyByteBuf.readByte();
         this.stateId = friendlyByteBuf.readVarInt();
         this.slot = friendlyByteBuf.readShort();
-        this.itemStack = ByteBufItemUtils.readItem(friendlyByteBuf);
+        this.itemStack = LimitlessByteBufUtils.readItem(friendlyByteBuf);
     }
 
     @Override
@@ -40,7 +38,7 @@ public class ClientboundContainerSetSlotMessage implements MessageV2<Clientbound
         buffer.writeByte(this.containerId);
         buffer.writeVarInt(this.stateId);
         buffer.writeShort(this.slot);
-        ByteBufItemUtils.writeItem(buffer, this.itemStack);
+        LimitlessByteBufUtils.writeItem(buffer, this.itemStack);
     }
 
     @Override

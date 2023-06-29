@@ -1,5 +1,7 @@
 package fuzs.netherchested.world.inventory;
 
+import fuzs.netherchested.NetherChested;
+import fuzs.netherchested.config.ServerConfig;
 import fuzs.netherchested.init.ModRegistry;
 import net.minecraft.world.Container;
 import net.minecraft.world.entity.player.Inventory;
@@ -7,12 +9,12 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 
-public class NetherChestMenu extends UnlimitedContainerMenu {
+public class NetherChestMenu extends LimitlessContainerMenu {
     private final int containerRows = 6;
     private final Container container;
 
     public NetherChestMenu(int containerId, Inventory inventory) {
-        this(containerId, inventory, new UnlimitedContainer(54));
+        this(containerId, inventory, new LimitlessContainer(NetherChested.CONFIG.get(ServerConfig.class).stackSizeMultiplier, 54));
     }
 
     public NetherChestMenu(int containerId, Inventory inventory, Container container) {

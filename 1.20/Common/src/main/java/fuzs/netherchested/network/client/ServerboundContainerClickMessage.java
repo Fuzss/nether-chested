@@ -1,7 +1,7 @@
 package fuzs.netherchested.network.client;
 
 import fuzs.netherchested.NetherChested;
-import fuzs.netherchested.network.ByteBufItemUtils;
+import fuzs.netherchested.network.LimitlessByteBufUtils;
 import fuzs.puzzleslib.api.network.v2.MessageV2;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMaps;
@@ -45,10 +45,10 @@ public class ServerboundContainerClickMessage implements MessageV2<ServerboundCo
         this.buttonNum = friendlyByteBuf.readByte();
         this.clickType = friendlyByteBuf.readEnum(ClickType.class);
         IntFunction<Int2ObjectOpenHashMap<ItemStack>> intFunction = FriendlyByteBuf.limitValue(Int2ObjectOpenHashMap::new, 128);
-        this.changedSlots = Int2ObjectMaps.unmodifiable((Int2ObjectMap)friendlyByteBuf.readMap(intFunction, (friendlyByteBufx) -> {
+        this.changedSlots = Int2ObjectMaps.unmodifiable(friendlyByteBuf.readMap(intFunction, (friendlyByteBufx) -> {
             return Integer.valueOf(friendlyByteBufx.readShort());
-        }, ByteBufItemUtils::readItem));
-        this.carriedItem = ByteBufItemUtils.readItem(friendlyByteBuf);
+        }, LimitlessByteBufUtils::readItem));
+        this.carriedItem = LimitlessByteBufUtils.readItem(friendlyByteBuf);
     }
 
     @Override
@@ -58,8 +58,8 @@ public class ServerboundContainerClickMessage implements MessageV2<ServerboundCo
         buffer.writeShort(this.slotNum);
         buffer.writeByte(this.buttonNum);
         buffer.writeEnum(this.clickType);
-        buffer.writeMap(this.changedSlots, FriendlyByteBuf::writeShort, ByteBufItemUtils::writeItem);
-        ByteBufItemUtils.writeItem(buffer, this.carriedItem);
+        buffer.writeMap(this.changedSlots, FriendlyByteBuf::writeShort, LimitlessByteBufUtils::writeItem);
+        LimitlessByteBufUtils.writeItem(buffer, this.carriedItem);
     }
 
     public int getContainerId() {

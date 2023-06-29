@@ -8,10 +8,10 @@ import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.ContainerSynchronizer;
 import net.minecraft.world.item.ItemStack;
 
-public class UnlimitedContainerSynchronizer implements ContainerSynchronizer {
+public class LimitlessContainerSynchronizer implements ContainerSynchronizer {
     private final ServerPlayer player;
 
-    public UnlimitedContainerSynchronizer(ServerPlayer player) {
+    public LimitlessContainerSynchronizer(ServerPlayer player) {
         this.player = player;
     }
 

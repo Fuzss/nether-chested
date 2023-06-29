@@ -4,7 +4,14 @@ def versionCatalog = extensions.getByType(VersionCatalogsExtension).named("libs"
 
 dependencies {
     // Puzzles Lib
-    api fg.deobf(libs.puzzleslib.forge.get())
+    api(fg.deobf(libs.puzzleslib.forge.get()))
+
+    // Puzzles Access Api
+    api(fg.deobf("fuzs.puzzlesaccessapi:puzzlesaccessapi-forge:8.0.2"))
+    jarJar(fg.deobf("fuzs.puzzlesaccessapi:puzzlesaccessapi-forge:8.0.2") {
+        jarJar.ranged(it, "[8.0.2,)")
+        transitive = false
+    })
 
     // Quality of Life Mods
     versionCatalog.findLibrary("bettermodsbutton.forge").ifPresent {
@@ -26,7 +33,3 @@ task signJar(type: net.minecraftforge.gradle.common.tasks.SignJar, dependsOn: ta
 
 jar.finalizedBy 'signJar'
 signJar.mustRunAfter 'reobfJar'
-
-minecraft {
-    accessTransformer = file('src/main/resources/META-INF/accesstransformer.cfg')
-}

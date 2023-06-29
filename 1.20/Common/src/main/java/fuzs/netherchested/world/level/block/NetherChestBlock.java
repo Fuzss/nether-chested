@@ -3,7 +3,7 @@ package fuzs.netherchested.world.level.block;
 import fuzs.netherchested.NetherChested;
 import fuzs.netherchested.config.ServerConfig;
 import fuzs.netherchested.init.ModRegistry;
-import fuzs.netherchested.network.UnlimitedContainerSynchronizer;
+import fuzs.netherchested.network.LimitlessContainerSynchronizer;
 import fuzs.netherchested.world.inventory.NetherChestMenu;
 import fuzs.netherchested.world.inventory.UnlimitedContainerUtils;
 import fuzs.netherchested.world.level.block.entity.NetherChestBlockEntity;
@@ -17,7 +17,6 @@ import net.minecraft.util.RandomSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.MenuProvider;
-import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.monster.piglin.PiglinAi;
 import net.minecraft.world.entity.player.Player;
@@ -80,7 +79,7 @@ public class NetherChestBlock extends EnderChestBlock {
                 if (menuProvider != null) {
                     OptionalInt containerId = player.openMenu(menuProvider);
                     if (containerId.isPresent() && player.containerMenu.containerId == containerId.getAsInt()) {
-                        ((NetherChestMenu) player.containerMenu).setActualSynchronizer(new UnlimitedContainerSynchronizer((ServerPlayer) player));
+                        ((NetherChestMenu) player.containerMenu).setActualSynchronizer(new LimitlessContainerSynchronizer((ServerPlayer) player));
                     }
                     PiglinAi.angerNearbyPiglins(player, true);
                 }
@@ -129,7 +128,7 @@ public class NetherChestBlock extends EnderChestBlock {
     @Override
     public void animateTick(BlockState state, Level level, BlockPos pos, RandomSource random) {
         // particle code from old Nether Chest mod as they look quite nice
-        for (int i = 0; i < 2; i++) {
+        if (random.nextInt(2) == 0) {
             double posX = pos.getX() + 0.5D + (0.4375D * (random.nextInt(2) * 2 - 1));
             double posY = pos.getY() + random.nextFloat();
             double posZ = pos.getZ() + 0.5D + (0.4375D * (random.nextInt(2) * 2 - 1));

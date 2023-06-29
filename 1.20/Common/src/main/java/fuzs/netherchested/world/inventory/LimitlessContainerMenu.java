@@ -1,5 +1,6 @@
 package fuzs.netherchested.world.inventory;
 
+import fuzs.puzzlesaccessapi.api.container.v1.ExtendableContainerMenu;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.Container;
 import net.minecraft.world.entity.player.Inventory;
@@ -9,9 +10,9 @@ import net.minecraft.world.item.ItemStack;
 
 import java.util.Optional;
 
-public abstract class UnlimitedContainerMenu extends AbstractContainerMenu {
+public abstract class LimitlessContainerMenu extends ExtendableContainerMenu {
 
-    public UnlimitedContainerMenu(MenuType<?> menuType, int containerId) {
+    public LimitlessContainerMenu(MenuType<?> menuType, int containerId) {
         super(menuType, containerId);
     }
 
@@ -25,47 +26,47 @@ public abstract class UnlimitedContainerMenu extends AbstractContainerMenu {
     }
 
     @Override
-    protected void doClick(int mouseX, int mouseY, ClickType clickType, Player player) {
+    protected void _doClick(int mouseX, int mouseY, ClickType clickType, Player player) {
         Inventory inventory = player.getInventory();
         if (clickType == ClickType.QUICK_CRAFT) {
-            int i = this.quickcraftStatus;
-            this.quickcraftStatus = getQuickcraftHeader(mouseY);
-            if ((i != 1 || this.quickcraftStatus != 2) && i != this.quickcraftStatus) {
+            int i = this.getQuickcraftStatus();
+            this.setQuickcraftStatus(getQuickcraftHeader(mouseY));
+            if ((i != 1 || this.getQuickcraftStatus() != 2) && i != this.getQuickcraftStatus()) {
                 this.resetQuickCraft();
             } else if (this.getCarried().isEmpty()) {
                 this.resetQuickCraft();
-            } else if (this.quickcraftStatus == 0) {
-                this.quickcraftType = getQuickcraftType(mouseY);
-                if (isValidQuickcraftType(this.quickcraftType, player)) {
-                    this.quickcraftStatus = 1;
-                    this.quickcraftSlots.clear();
+            } else if (this.getQuickcraftStatus() == 0) {
+                this.setQuickcraftType(getQuickcraftType(mouseY));
+                if (isValidQuickcraftType(this.getQuickcraftType(), player)) {
+                    this.setQuickcraftStatus(1);
+                    this.getQuickcraftSlots().clear();
                 } else {
                     this.resetQuickCraft();
                 }
-            } else if (this.quickcraftStatus == 1) {
+            } else if (this.getQuickcraftStatus() == 1) {
                 Slot slot = this.slots.get(mouseX);
                 ItemStack itemStack = this.getCarried();
-                if (UnlimitedContainerUtils.canItemQuickReplace(slot, itemStack, true) && slot.mayPlace(itemStack) && (this.quickcraftType == 2 || itemStack.getCount() > this.quickcraftSlots.size()) && this.canDragTo(slot)) {
-                    this.quickcraftSlots.add(slot);
+                if (UnlimitedContainerUtils.canItemQuickReplace(slot, itemStack, true) && slot.mayPlace(itemStack) && (this.getQuickcraftType() == 2 || itemStack.getCount() > this.getQuickcraftSlots().size()) && this.canDragTo(slot)) {
+                    this.getQuickcraftSlots().add(slot);
                 }
-            } else if (this.quickcraftStatus == 2) {
-                if (!this.quickcraftSlots.isEmpty()) {
-                    if (this.quickcraftSlots.size() == 1) {
-                        int j = this.quickcraftSlots.iterator().next().index;
+            } else if (this.getQuickcraftStatus() == 2) {
+                if (!this.getQuickcraftSlots().isEmpty()) {
+                    if (this.getQuickcraftSlots().size() == 1) {
+                        int j = this.getQuickcraftSlots().iterator().next().index;
                         this.resetQuickCraft();
-                        this.doClick(j, this.quickcraftType, ClickType.PICKUP, player);
+                        this._doClick(j, this.getQuickcraftType(), ClickType.PICKUP, player);
                         return;
                     }
 
                     ItemStack itemStack2 = this.getCarried().copy();
                     int k = this.getCarried().getCount();
 
-                    for (Slot slot2 : this.quickcraftSlots) {
+                    for (Slot slot2 : this.getQuickcraftSlots()) {
                         ItemStack itemStack3 = this.getCarried();
-                        if (slot2 != null && UnlimitedContainerUtils.canItemQuickReplace(slot2, itemStack3, true) && slot2.mayPlace(itemStack3) && (this.quickcraftType == 2 || itemStack3.getCount() >= this.quickcraftSlots.size()) && this.canDragTo(slot2)) {
+                        if (slot2 != null && UnlimitedContainerUtils.canItemQuickReplace(slot2, itemStack3, true) && slot2.mayPlace(itemStack3) && (this.getQuickcraftType() == 2 || itemStack3.getCount() >= this.getQuickcraftSlots().size()) && this.canDragTo(slot2)) {
                             ItemStack itemStack4 = itemStack2.copy();
                             int l = slot2.hasItem() ? slot2.getItem().getCount() : 0;
-                            UnlimitedContainerUtils.getQuickCraftSlotCount(this.quickcraftSlots, this.quickcraftType, itemStack4, l, slot2);
+                            UnlimitedContainerUtils.getQuickCraftSlotCount(this.getQuickcraftSlots(), this.getQuickcraftType(), itemStack4, l, slot2);
                             int m = slot2.getMaxStackSize(itemStack4);
                             if (itemStack4.getCount() > m) {
                                 itemStack4.setCount(m);
@@ -84,7 +85,7 @@ public abstract class UnlimitedContainerMenu extends AbstractContainerMenu {
             } else {
                 this.resetQuickCraft();
             }
-        } else if (this.quickcraftStatus != 0) {
+        } else if (this.getQuickcraftStatus() != 0) {
             this.resetQuickCraft();
         } else if ((clickType == ClickType.PICKUP || clickType == ClickType.QUICK_MOVE) && (mouseY == 0 || mouseY == 1)) {
             ClickAction clickAction = mouseY == 0 ? ClickAction.PRIMARY : ClickAction.SECONDARY;
@@ -121,7 +122,7 @@ public abstract class UnlimitedContainerMenu extends AbstractContainerMenu {
                 ItemStack itemStack = slot.getItem();
                 ItemStack itemStack5 = this.getCarried();
                 player.updateTutorialInventoryAction(itemStack5, slot.getItem(), clickAction);
-                if (!this.tryItemClickBehaviourOverride(player, clickAction, slot, itemStack, itemStack5)) {
+                if (!this._tryItemClickBehaviourOverride(player, clickAction, slot, itemStack, itemStack5)) {
                     if (itemStack.isEmpty()) {
                         if (!itemStack5.isEmpty()) {
                             int n = clickAction == ClickAction.PRIMARY ? itemStack5.getCount() : 1;

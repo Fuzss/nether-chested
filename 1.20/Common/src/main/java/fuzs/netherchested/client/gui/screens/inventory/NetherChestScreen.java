@@ -8,7 +8,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
 
-public class NetherChestScreen extends UnlimitedContainerScreen<NetherChestMenu> {
+public class NetherChestScreen extends LimitlessContainerScreen<NetherChestMenu> {
     private static final ResourceLocation CONTAINER_BACKGROUND = NetherChested.id("textures/gui/container/nether_chest.png");
 
     public NetherChestScreen(NetherChestMenu chestMenu, Inventory inventory, Component component) {
