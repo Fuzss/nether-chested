@@ -3,8 +3,9 @@ package fuzs.netherchested.world.level.block.entity;
 import fuzs.netherchested.NetherChested;
 import fuzs.netherchested.config.ServerConfig;
 import fuzs.netherchested.init.ModRegistry;
+import fuzs.netherchested.world.inventory.LimitlessContainerUtils;
+import fuzs.netherchested.world.inventory.MultipliedContainer;
 import fuzs.netherchested.world.inventory.NetherChestMenu;
-import fuzs.netherchested.world.inventory.UnlimitedContainerUtils;
 import fuzs.puzzleslib.api.container.v1.ContainerImpl;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.NonNullList;
@@ -13,7 +14,6 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
-import net.minecraft.world.Container;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
@@ -29,67 +29,12 @@ import net.minecraft.world.level.block.state.BlockState;
  * {@link net.minecraft.world.Container} to be able to handle item transfers ourselves on Fabric.
  */
 public class NetherChestBlockEntity extends NamedBlockEntity implements LidBlockEntity {
-    private static final int CONTAINER_SIZE = 54;
+    public static final int CONTAINER_SIZE = 54;
     private static final MutableComponent CONTAINER_TITLE = Component.translatable("container.nether_chest");
 
-    private final ContainerOpenersCounter openersCounter = new ContainerOpenersCounter() {
-
-        @Override
-        protected void onOpen(Level level, BlockPos pos, BlockState state) {
-            level.playSound(null, (double) pos.getX() + 0.5, (double) pos.getY() + 0.5, (double) pos.getZ() + 0.5, SoundEvents.ENDER_CHEST_OPEN, SoundSource.BLOCKS, 0.5F, level.random.nextFloat() * 0.1F + 0.9F);
-        }
-
-        @Override
-        protected void onClose(Level level, BlockPos pos, BlockState state) {
-            level.playSound(null, (double) pos.getX() + 0.5, (double) pos.getY() + 0.5, (double) pos.getZ() + 0.5, SoundEvents.ENDER_CHEST_CLOSE, SoundSource.BLOCKS, 0.5F, level.random.nextFloat() * 0.1F + 0.9F);
-        }
-
-        @Override
-        protected void openerCountChanged(Level level, BlockPos pos, BlockState state, int count, int openCount) {
-            level.blockEvent(pos, state.getBlock(), 1, openCount);
-        }
-
-        @Override
-        protected boolean isOwnContainer(Player player) {
-            if (player.containerMenu instanceof NetherChestMenu netherChestMenu) {
-                return netherChestMenu.getContainer() == NetherChestBlockEntity.this.container;
-            } else {
-                return false;
-            }
-        }
-    };
+    private final ContainerOpenersCounter openersCounter = new NetherChestOpenersCounter();
     private final ChestLidController chestLidController = new ChestLidController();
-    public final Container container = new ContainerImpl() {
-
-        @Override
-        public NonNullList<ItemStack> getItems() {
-            return NetherChestBlockEntity.this.items;
-        }
-
-        @Override
-        public void startOpen(Player player) {
-            if (!NetherChestBlockEntity.this.remove && !player.isSpectator()) {
-                NetherChestBlockEntity.this.openersCounter.incrementOpeners(player, NetherChestBlockEntity.this.getLevel(), NetherChestBlockEntity.this.getBlockPos(), NetherChestBlockEntity.this.getBlockState());
-            }
-        }
-
-        @Override
-        public void stopOpen(Player player) {
-            if (!NetherChestBlockEntity.this.remove && !player.isSpectator()) {
-                NetherChestBlockEntity.this.openersCounter.decrementOpeners(player, NetherChestBlockEntity.this.getLevel(), NetherChestBlockEntity.this.getBlockPos(), NetherChestBlockEntity.this.getBlockState());
-            }
-        }
-
-        @Override
-        public int getMaxStackSize() {
-            return ContainerImpl.super.getMaxStackSize() * NetherChested.CONFIG.get(ServerConfig.class).stackSizeMultiplier;
-        }
-
-        @Override
-        public void setChanged() {
-            NetherChestBlockEntity.this.setChanged();
-        }
-    };
+    public final MultipliedContainer container = new NetherChestContainer();
     private NonNullList<ItemStack> items;
 
     public NetherChestBlockEntity(BlockPos blockPos, BlockState blockState) {
@@ -125,7 +70,7 @@ public class NetherChestBlockEntity extends NamedBlockEntity implements LidBlock
     public void load(CompoundTag tag) {
         super.load(tag);
         this.items = NonNullList.withSize(CONTAINER_SIZE, ItemStack.EMPTY);
-        UnlimitedContainerUtils.loadAllItems(tag, this.items);
+        LimitlessContainerUtils.loadAllItems(tag, this.items);
 
     }
 
@@ -133,7 +78,7 @@ public class NetherChestBlockEntity extends NamedBlockEntity implements LidBlock
     protected void saveAdditional(CompoundTag tag) {
         super.saveAdditional(tag);
         tag.remove("Items");
-        UnlimitedContainerUtils.saveAllItems(tag, this.items, true);
+        LimitlessContainerUtils.saveAllItems(tag, this.items, true);
     }
 
     @Override
@@ -144,6 +89,65 @@ public class NetherChestBlockEntity extends NamedBlockEntity implements LidBlock
     public void recheckOpen() {
         if (!this.remove) {
             this.openersCounter.recheckOpeners(this.getLevel(), this.getBlockPos(), this.getBlockState());
+        }
+    }
+
+    private class NetherChestContainer implements ContainerImpl, MultipliedContainer {
+
+        @Override
+        public NonNullList<ItemStack> getItems() {
+            return NetherChestBlockEntity.this.items;
+        }
+
+        @Override
+        public void startOpen(Player player) {
+            if (!NetherChestBlockEntity.this.remove && !player.isSpectator()) {
+                NetherChestBlockEntity.this.openersCounter.incrementOpeners(player, NetherChestBlockEntity.this.getLevel(), NetherChestBlockEntity.this.getBlockPos(), NetherChestBlockEntity.this.getBlockState());
+            }
+        }
+
+        @Override
+        public void stopOpen(Player player) {
+            if (!NetherChestBlockEntity.this.remove && !player.isSpectator()) {
+                NetherChestBlockEntity.this.openersCounter.decrementOpeners(player, NetherChestBlockEntity.this.getLevel(), NetherChestBlockEntity.this.getBlockPos(), NetherChestBlockEntity.this.getBlockState());
+            }
+        }
+
+        @Override
+        public void setChanged() {
+            NetherChestBlockEntity.this.setChanged();
+        }
+
+        @Override
+        public int getStackSizeMultiplier() {
+            return NetherChested.CONFIG.get(ServerConfig.class).stackSizeMultiplier;
+        }
+    }
+
+    private class NetherChestOpenersCounter extends ContainerOpenersCounter {
+
+        @Override
+        protected void onOpen(Level level, BlockPos pos, BlockState state) {
+            level.playSound(null, (double) pos.getX() + 0.5, (double) pos.getY() + 0.5, (double) pos.getZ() + 0.5, SoundEvents.ENDER_CHEST_OPEN, SoundSource.BLOCKS, 0.5F, level.random.nextFloat() * 0.1F + 0.9F);
+        }
+
+        @Override
+        protected void onClose(Level level, BlockPos pos, BlockState state) {
+            level.playSound(null, (double) pos.getX() + 0.5, (double) pos.getY() + 0.5, (double) pos.getZ() + 0.5, SoundEvents.ENDER_CHEST_CLOSE, SoundSource.BLOCKS, 0.5F, level.random.nextFloat() * 0.1F + 0.9F);
+        }
+
+        @Override
+        protected void openerCountChanged(Level level, BlockPos pos, BlockState state, int count, int openCount) {
+            level.blockEvent(pos, state.getBlock(), 1, openCount);
+        }
+
+        @Override
+        protected boolean isOwnContainer(Player player) {
+            if (player.containerMenu instanceof NetherChestMenu netherChestMenu) {
+                return netherChestMenu.getContainer() == NetherChestBlockEntity.this.container;
+            } else {
+                return false;
+            }
         }
     }
 }

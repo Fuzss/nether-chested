@@ -3,21 +3,21 @@ package fuzs.netherchested.world.inventory;
 import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.item.ItemStack;
 
-public class LimitlessContainer extends SimpleContainer {
+public class MultipliedSimpleContainer extends SimpleContainer implements MultipliedContainer {
     private final int stackSizeMultiplier;
 
-    public LimitlessContainer(int stackSizeMultiplier, int size) {
+    public MultipliedSimpleContainer(int stackSizeMultiplier, int size) {
         super(size);
         this.stackSizeMultiplier = stackSizeMultiplier;
     }
 
-    public LimitlessContainer(int stackSizeMultiplier, ItemStack... items) {
+    public MultipliedSimpleContainer(int stackSizeMultiplier, ItemStack... items) {
         super(items);
         this.stackSizeMultiplier = stackSizeMultiplier;
     }
 
     @Override
-    public int getMaxStackSize() {
-        return super.getMaxStackSize() * this.stackSizeMultiplier;
+    public int getStackSizeMultiplier() {
+        return this.stackSizeMultiplier;
     }
 }

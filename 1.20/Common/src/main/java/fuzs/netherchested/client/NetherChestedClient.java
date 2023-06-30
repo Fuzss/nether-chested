@@ -7,7 +7,6 @@ import fuzs.netherchested.world.level.block.entity.NetherChestBlockEntity;
 import fuzs.puzzleslib.api.client.core.v1.ClientModConstructor;
 import fuzs.puzzleslib.api.client.core.v1.context.BlockEntityRenderersContext;
 import fuzs.puzzleslib.api.client.core.v1.context.BuiltinModelItemRendererContext;
-import fuzs.puzzleslib.api.core.v1.context.ModLifecycleContext;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.MenuScreens;
 import net.minecraft.client.renderer.MultiBufferSource;
@@ -19,7 +18,7 @@ import net.minecraft.world.item.ItemStack;
 public class NetherChestedClient implements ClientModConstructor {
 
     @Override
-    public void onClientSetup(ModLifecycleContext context) {
+    public void onClientSetup() {
         MenuScreens.register(ModRegistry.NETHER_CHEST_MENU_TYPE.get(), NetherChestScreen::new);
     }
 

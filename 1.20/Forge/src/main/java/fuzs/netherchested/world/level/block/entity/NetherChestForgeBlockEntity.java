@@ -1,6 +1,6 @@
 package fuzs.netherchested.world.level.block.entity;
 
-import fuzs.netherchested.world.inventory.UnlimitedInvWrapper;
+import fuzs.netherchested.world.inventory.LimitlessInvWrapper;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.block.state.BlockState;
@@ -33,7 +33,7 @@ public class NetherChestForgeBlockEntity extends NetherChestBlockEntity {
     public <T> LazyOptional<T> getCapability(Capability<T> cap, Direction side) {
         if (!this.remove && cap == ForgeCapabilities.ITEM_HANDLER) {
             if (this.chestHandler == null)
-                this.chestHandler = LazyOptional.of(() -> new UnlimitedInvWrapper(this.container));
+                this.chestHandler = LazyOptional.of(() -> new LimitlessInvWrapper(this.container));
             return this.chestHandler.cast();
         }
         return super.getCapability(cap, side);

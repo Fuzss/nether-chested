@@ -3,6 +3,7 @@ package fuzs.netherchested.world.inventory;
 import fuzs.netherchested.NetherChested;
 import fuzs.netherchested.config.ServerConfig;
 import fuzs.netherchested.init.ModRegistry;
+import fuzs.netherchested.world.level.block.entity.NetherChestBlockEntity;
 import net.minecraft.world.Container;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
@@ -14,17 +15,17 @@ public class NetherChestMenu extends LimitlessContainerMenu {
     private final Container container;
 
     public NetherChestMenu(int containerId, Inventory inventory) {
-        this(containerId, inventory, new LimitlessContainer(NetherChested.CONFIG.get(ServerConfig.class).stackSizeMultiplier, 54));
+        this(containerId, inventory, new MultipliedSimpleContainer(NetherChested.CONFIG.get(ServerConfig.class).stackSizeMultiplier, NetherChestBlockEntity.CONTAINER_SIZE));
     }
 
-    public NetherChestMenu(int containerId, Inventory inventory, Container container) {
+    public NetherChestMenu(int containerId, Inventory inventory, MultipliedContainer container) {
         super(ModRegistry.NETHER_CHEST_MENU_TYPE.get(), containerId);
         checkContainerSize(container, this.containerRows * 9);
         this.container = container;
         container.startOpen(inventory.player);
         for (int l = 0; l < this.containerRows; ++l) {
             for (int m = 0; m < 9; ++m) {
-                this.addSlot(new UnlimitedSlot(container, m + l * 9, 8 + m * 18, 18 + 1 + l * 18));
+                this.addSlot(new MultipliedSlot(container, m + l * 9, 8 + m * 18, 18 + 1 + l * 18));
             }
         }
 

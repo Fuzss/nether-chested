@@ -23,8 +23,8 @@ public class NetherChestedForge {
 
     @SubscribeEvent
     public static void onConstructMod(final FMLConstructModEvent evt) {
-        ModConstructor.construct(NetherChested.MOD_ID, NetherChested::new);
         ForgeModRegistry.touch();
+        ModConstructor.construct(NetherChested.MOD_ID, NetherChested::new);
     }
 
     @SubscribeEvent

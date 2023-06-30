@@ -1,16 +1,16 @@
 package fuzs.netherchested.world.inventory;
 
-import fuzs.netherchested.world.inventory.UnlimitedContainerUtils;
-import net.minecraft.world.Container;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.items.ItemHandlerHelper;
 import net.minecraftforge.items.wrapper.InvWrapper;
 import org.jetbrains.annotations.NotNull;
 
-public class UnlimitedInvWrapper extends InvWrapper {
+public class LimitlessInvWrapper extends InvWrapper {
+    private final int stackSizeMultiplier;
 
-    public UnlimitedInvWrapper(Container inv) {
+    public LimitlessInvWrapper(MultipliedContainer inv) {
         super(inv);
+        this.stackSizeMultiplier = inv.getStackSizeMultiplier();
     }
 
     @Override
@@ -22,14 +22,14 @@ public class UnlimitedInvWrapper extends InvWrapper {
 
         int m;
         if (!stackInSlot.isEmpty()) {
-            if (stackInSlot.getCount() >= Math.min(UnlimitedContainerUtils.getMaxStackSize(stackInSlot), this.getSlotLimit(slot)))
+            if (stackInSlot.getCount() >= Math.min(LimitlessContainerUtils.getMaxStackSizeOrDefault(stackInSlot, this.stackSizeMultiplier), this.getSlotLimit(slot)))
                 return stack;
 
             if (!ItemHandlerHelper.canItemStacksStack(stack, stackInSlot)) return stack;
 
             if (!this.getInv().canPlaceItem(slot, stack)) return stack;
 
-            m = Math.min(UnlimitedContainerUtils.getMaxStackSize(stack), this.getSlotLimit(slot)) - stackInSlot.getCount();
+            m = Math.min(LimitlessContainerUtils.getMaxStackSizeOrDefault(stack, this.stackSizeMultiplier), this.getSlotLimit(slot)) - stackInSlot.getCount();
 
             if (stack.getCount() <= m) {
                 if (!simulate) {
@@ -57,7 +57,7 @@ public class UnlimitedInvWrapper extends InvWrapper {
         } else {
             if (!this.getInv().canPlaceItem(slot, stack)) return stack;
 
-            m = Math.min(UnlimitedContainerUtils.getMaxStackSize(stack), this.getSlotLimit(slot));
+            m = Math.min(LimitlessContainerUtils.getMaxStackSizeOrDefault(stack, this.stackSizeMultiplier), this.getSlotLimit(slot));
             if (m < stack.getCount()) {
                 // copy the stack to not modify the original one
                 stack = stack.copy();

@@ -1,6 +1,7 @@
 package fuzs.netherchested.network;
 
 import fuzs.netherchested.NetherChested;
+import fuzs.netherchested.world.inventory.LimitlessContainerMenu;
 import net.minecraft.core.NonNullList;
 import net.minecraft.network.protocol.game.ClientboundContainerSetDataPacket;
 import net.minecraft.server.level.ServerPlayer;
@@ -13,6 +14,12 @@ public class LimitlessContainerSynchronizer implements ContainerSynchronizer {
 
     public LimitlessContainerSynchronizer(ServerPlayer player) {
         this.player = player;
+    }
+
+    public static void setSynchronizerFor(ServerPlayer player, int containerId) {
+        if (player.containerMenu instanceof LimitlessContainerMenu menu && menu.containerId == containerId) {
+            menu.setActualSynchronizer(new LimitlessContainerSynchronizer(player));
+        }
     }
 
     @Override

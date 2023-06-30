@@ -26,7 +26,7 @@ public abstract class LimitlessContainerMenu extends ExtendableContainerMenu {
     }
 
     @Override
-    protected void _doClick(int mouseX, int mouseY, ClickType clickType, Player player) {
+    protected void doClick(int mouseX, int mouseY, ClickType clickType, Player player) {
         Inventory inventory = player.getInventory();
         if (clickType == ClickType.QUICK_CRAFT) {
             int i = this.getQuickcraftStatus();
@@ -46,7 +46,7 @@ public abstract class LimitlessContainerMenu extends ExtendableContainerMenu {
             } else if (this.getQuickcraftStatus() == 1) {
                 Slot slot = this.slots.get(mouseX);
                 ItemStack itemStack = this.getCarried();
-                if (UnlimitedContainerUtils.canItemQuickReplace(slot, itemStack, true) && slot.mayPlace(itemStack) && (this.getQuickcraftType() == 2 || itemStack.getCount() > this.getQuickcraftSlots().size()) && this.canDragTo(slot)) {
+                if (LimitlessContainerUtils.canItemQuickReplace(slot, itemStack, true) && slot.mayPlace(itemStack) && (this.getQuickcraftType() == 2 || itemStack.getCount() > this.getQuickcraftSlots().size()) && this.canDragTo(slot)) {
                     this.getQuickcraftSlots().add(slot);
                 }
             } else if (this.getQuickcraftStatus() == 2) {
@@ -54,7 +54,7 @@ public abstract class LimitlessContainerMenu extends ExtendableContainerMenu {
                     if (this.getQuickcraftSlots().size() == 1) {
                         int j = this.getQuickcraftSlots().iterator().next().index;
                         this.resetQuickCraft();
-                        this._doClick(j, this.getQuickcraftType(), ClickType.PICKUP, player);
+                        this.doClick(j, this.getQuickcraftType(), ClickType.PICKUP, player);
                         return;
                     }
 
@@ -63,10 +63,10 @@ public abstract class LimitlessContainerMenu extends ExtendableContainerMenu {
 
                     for (Slot slot2 : this.getQuickcraftSlots()) {
                         ItemStack itemStack3 = this.getCarried();
-                        if (slot2 != null && UnlimitedContainerUtils.canItemQuickReplace(slot2, itemStack3, true) && slot2.mayPlace(itemStack3) && (this.getQuickcraftType() == 2 || itemStack3.getCount() >= this.getQuickcraftSlots().size()) && this.canDragTo(slot2)) {
+                        if (slot2 != null && LimitlessContainerUtils.canItemQuickReplace(slot2, itemStack3, true) && slot2.mayPlace(itemStack3) && (this.getQuickcraftType() == 2 || itemStack3.getCount() >= this.getQuickcraftSlots().size()) && this.canDragTo(slot2)) {
                             ItemStack itemStack4 = itemStack2.copy();
                             int l = slot2.hasItem() ? slot2.getItem().getCount() : 0;
-                            UnlimitedContainerUtils.getQuickCraftSlotCount(this.getQuickcraftSlots(), this.getQuickcraftType(), itemStack4, l, slot2);
+                            LimitlessContainerUtils.getQuickCraftSlotCount(this.getQuickcraftSlots(), this.getQuickcraftType(), itemStack4, l, slot2);
                             int m = slot2.getMaxStackSize(itemStack4);
                             if (itemStack4.getCount() > m) {
                                 itemStack4.setCount(m);
@@ -92,10 +92,10 @@ public abstract class LimitlessContainerMenu extends ExtendableContainerMenu {
             if (mouseX == -999) {
                 if (!this.getCarried().isEmpty()) {
                     if (clickAction == ClickAction.PRIMARY) {
-                        UnlimitedContainerUtils.dropPlayerItem(player, this.getCarried(), true);
+                        LimitlessContainerUtils.dropPlayerItem(player, this.getCarried(), true);
                         this.setCarried(ItemStack.EMPTY);
                     } else {
-                        UnlimitedContainerUtils.dropPlayerItem(player, this.getCarried().split(1), true);
+                        LimitlessContainerUtils.dropPlayerItem(player, this.getCarried().split(1), true);
                     }
                 }
             } else if (clickType == ClickType.QUICK_MOVE) {
@@ -122,7 +122,7 @@ public abstract class LimitlessContainerMenu extends ExtendableContainerMenu {
                 ItemStack itemStack = slot.getItem();
                 ItemStack itemStack5 = this.getCarried();
                 player.updateTutorialInventoryAction(itemStack5, slot.getItem(), clickAction);
-                if (!this._tryItemClickBehaviourOverride(player, clickAction, slot, itemStack, itemStack5)) {
+                if (!this.tryItemClickBehaviourOverride(player, clickAction, slot, itemStack, itemStack5)) {
                     if (itemStack.isEmpty()) {
                         if (!itemStack5.isEmpty()) {
                             int n = clickAction == ClickAction.PRIMARY ? itemStack5.getCount() : 1;
@@ -184,7 +184,7 @@ public abstract class LimitlessContainerMenu extends ExtendableContainerMenu {
                         slot3.set(itemStack2.split(o));
                         slot3.onTake(player, itemStack);
                         if (!inventory.add(itemStack)) {
-                            UnlimitedContainerUtils.dropPlayerItem(player, itemStack, true);
+                            LimitlessContainerUtils.dropPlayerItem(player, itemStack, true);
                         }
                     } else {
                         inventory.setItem(mouseY, itemStack);
@@ -196,15 +196,14 @@ public abstract class LimitlessContainerMenu extends ExtendableContainerMenu {
         } else if (clickType == ClickType.CLONE && player.getAbilities().instabuild && this.getCarried().isEmpty() && mouseX >= 0) {
             Slot slot3 = this.slots.get(mouseX);
             if (slot3.hasItem()) {
-                ItemStack itemStack2 = slot3.getItem().copy();
-                itemStack2.setCount(slot3.getMaxStackSize(itemStack2));
-                this.setCarried(itemStack2);
+                ItemStack itemStack2 = slot3.getItem();
+                this.setCarried(itemStack2.copyWithCount(slot3.getMaxStackSize(itemStack2)));
             }
         } else if (clickType == ClickType.THROW && this.getCarried().isEmpty() && mouseX >= 0) {
             Slot slot3 = this.slots.get(mouseX);
             int j = mouseY == 0 ? 1 : slot3.getItem().getCount();
             ItemStack itemStack = slot3.safeTake(j, Integer.MAX_VALUE, player);
-            UnlimitedContainerUtils.dropPlayerItem(player, itemStack, true);
+            LimitlessContainerUtils.dropPlayerItem(player, itemStack, true);
         } else if (clickType == ClickType.PICKUP_ALL && mouseX >= 0) {
             Slot slot3 = this.slots.get(mouseX);
             ItemStack itemStack2 = this.getCarried();
@@ -215,7 +214,7 @@ public abstract class LimitlessContainerMenu extends ExtendableContainerMenu {
                 for (int n = 0; n < 2; ++n) {
                     for (int p = k; p >= 0 && p < this.slots.size() && itemStack2.getCount() < this.slots.get(p).getMaxStackSize(itemStack2); p += o) {
                         Slot slot4 = this.slots.get(p);
-                        if (slot4.hasItem() && UnlimitedContainerUtils.canItemQuickReplace(slot4, itemStack2, true) && slot4.mayPickup(player) && this.canTakeItemForPickAll(itemStack2, slot4)) {
+                        if (slot4.hasItem() && LimitlessContainerUtils.canItemQuickReplace(slot4, itemStack2, true) && slot4.mayPickup(player) && this.canTakeItemForPickAll(itemStack2, slot4)) {
                             ItemStack itemStack6 = slot4.getItem();
                             if (n != 0 || itemStack6.getCount() != slot4.getMaxStackSize(itemStack6)) {
                                 ItemStack itemStack7 = slot4.safeTake(itemStack6.getCount(), slot4.getMaxStackSize(itemStack2) - itemStack2.getCount(), player);
@@ -234,9 +233,9 @@ public abstract class LimitlessContainerMenu extends ExtendableContainerMenu {
             ItemStack itemStack = this.getCarried();
             if (!itemStack.isEmpty()) {
                 if (player.isAlive() && !((ServerPlayer) player).hasDisconnected()) {
-                    UnlimitedContainerUtils.placeItemBackInPlayerInventory(player, itemStack);
+                    LimitlessContainerUtils.placeItemBackInPlayerInventory(player, itemStack);
                 } else {
-                    UnlimitedContainerUtils.dropPlayerItem(player, itemStack, false);
+                    LimitlessContainerUtils.dropPlayerItem(player, itemStack, false);
                 }
 
                 this.setCarried(ItemStack.EMPTY);
@@ -254,7 +253,7 @@ public abstract class LimitlessContainerMenu extends ExtendableContainerMenu {
 
         } else if (player instanceof ServerPlayer) {
             for (i = 0; i < container.getContainerSize(); ++i) {
-                UnlimitedContainerUtils.placeItemBackInPlayerInventory(player, container.removeItemNoUpdate(i));
+                LimitlessContainerUtils.placeItemBackInPlayerInventory(player, container.removeItemNoUpdate(i));
             }
         }
     }
@@ -267,7 +266,7 @@ public abstract class LimitlessContainerMenu extends ExtendableContainerMenu {
             i = endIndex - 1;
         }
 
-        if (UnlimitedContainerUtils.canIncreaseStackSize(stack)) {
+        if (stack.getMaxStackSize() > 1 || !stack.isDamageableItem()) {
             while (!stack.isEmpty()) {
                 if (reverseDirection) {
                     if (i < startIndex) {

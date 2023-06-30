@@ -5,7 +5,7 @@ dependencies {
     modApi libs.puzzleslib.common
 
     // Puzzles Access Api
-    api "fuzs.puzzlesaccessapi:puzzlesaccessapi-common:8.0.2"
+    api "fuzs.puzzlesaccessapi:puzzlesaccessapi-common:8.0.5"
 }
 
 // @see https://github.com/jaredlll08/MultiLoader-Template/issues/17#issuecomment-1221598082

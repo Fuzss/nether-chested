@@ -20,7 +20,7 @@ dependencies {
 //    modApi(include(libs.extensibleenums.fabric.get()))
 
     // Puzzles Access Api
-    modApi(include("fuzs.puzzlesaccessapi:puzzlesaccessapi-fabric:8.0.2"))
+    modApi(include("fuzs.puzzlesaccessapi:puzzlesaccessapi-fabric:8.0.5"))
 
     // Quality of Life Mods
     versionCatalog.findLibrary("modmenu.fabric").ifPresent {

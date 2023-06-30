@@ -1,7 +1,5 @@
 package fuzs.netherchested.world.inventory;
 
-import fuzs.netherchested.NetherChested;
-import fuzs.netherchested.config.ServerConfig;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.NonNullList;
 import net.minecraft.nbt.CompoundTag;
@@ -21,7 +19,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.OptionalInt;
 import java.util.Set;
 
-public class UnlimitedContainerUtils {
+public class LimitlessContainerUtils {
 
     public static CompoundTag saveAllItems(CompoundTag tag, NonNullList<ItemStack> list, boolean saveEmpty) {
         ListTag listTag = new ListTag();
@@ -86,18 +84,12 @@ public class UnlimitedContainerUtils {
         }
     }
 
-    public static boolean canIncreaseStackSize(ItemStack stack) {
-        if (NetherChested.CONFIG.get(ServerConfig.class).increaseStackableOnly) return stack.isStackable();
-        return stack.getMaxStackSize() > 1 || !stack.isDamageableItem() || !stack.isDamaged();
+    public static int getMaxStackSizeOrDefault(ItemStack stack, int stackSizeMultiplier) {
+        return getMaxStackSize(stack, stackSizeMultiplier).orElseGet(stack::getMaxStackSize);
     }
 
-    public static int getMaxStackSize(ItemStack stack) {
-        return getOptionalMaxStackSize(stack).orElseGet(stack::getMaxStackSize);
-    }
-
-    public static OptionalInt getOptionalMaxStackSize(ItemStack stack) {
-        if (!canIncreaseStackSize(stack)) return OptionalInt.empty();
-        return OptionalInt.of(stack.getMaxStackSize() * NetherChested.CONFIG.get(ServerConfig.class).stackSizeMultiplier);
+    public static OptionalInt getMaxStackSize(ItemStack stack, int stackSizeMultiplier) {
+        return stack.getMaxStackSize() > 1 || !stack.isDamageableItem() ? OptionalInt.of(stack.getMaxStackSize() * stackSizeMultiplier) : OptionalInt.empty();
     }
 
     public static void getQuickCraftSlotCount(Set<Slot> dragSlots, int dragMode, ItemStack stack, int slotStackSize, Slot slot) {
@@ -125,10 +117,10 @@ public class UnlimitedContainerUtils {
     }
 
     public static int getRedstoneSignalFromBlockEntity(@Nullable BlockEntity blockEntity) {
-        return blockEntity instanceof Container ? getRedstoneSignalFromContainer((Container) blockEntity) : 0;
+        return blockEntity instanceof MultipliedContainer container ? getRedstoneSignalFromContainer(container) : 0;
     }
 
-    public static int getRedstoneSignalFromContainer(@Nullable Container container) {
+    public static int getRedstoneSignalFromContainer(@Nullable MultipliedContainer container) {
         if (container == null) {
             return 0;
         } else {
@@ -138,7 +130,7 @@ public class UnlimitedContainerUtils {
             for (int j = 0; j < container.getContainerSize(); ++j) {
                 ItemStack itemStack = container.getItem(j);
                 if (!itemStack.isEmpty()) {
-                    f += (float) itemStack.getCount() / Math.min(container.getMaxStackSize(), getMaxStackSize(itemStack));
+                    f += (float) itemStack.getCount() / Math.min(container.getMaxStackSize(), getMaxStackSizeOrDefault(itemStack, container.getStackSizeMultiplier()));
                     ++i;
                 }
             }

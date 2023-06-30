@@ -14,6 +14,4 @@ public class ServerConfig implements ConfigCore {
     public int netherExplosionStrength = 5;
     @Config(description = "Prevent a nether chest from opening when a block is placed directly above.")
     public boolean noBlockAbove = true;
-    @Config(description = {"Only increase the stacks size for items that are already stackable, so items like tools will remain unstackable in a nether chest.", "Note that the stack size of already damaged items cannot be increased."})
-    public boolean increaseStackableOnly = false;
 }

@@ -4,8 +4,7 @@ import fuzs.netherchested.NetherChested;
 import fuzs.netherchested.config.ServerConfig;
 import fuzs.netherchested.init.ModRegistry;
 import fuzs.netherchested.network.LimitlessContainerSynchronizer;
-import fuzs.netherchested.world.inventory.NetherChestMenu;
-import fuzs.netherchested.world.inventory.UnlimitedContainerUtils;
+import fuzs.netherchested.world.inventory.LimitlessContainerUtils;
 import fuzs.netherchested.world.level.block.entity.NetherChestBlockEntity;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
@@ -34,7 +33,6 @@ import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
-import java.util.OptionalInt;
 
 @SuppressWarnings("deprecation")
 public class NetherChestBlock extends EnderChestBlock {
@@ -58,7 +56,7 @@ public class NetherChestBlock extends EnderChestBlock {
     public void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean isMoving) {
         if (!state.is(newState.getBlock())) {
             if (level.getBlockEntity(pos) instanceof NetherChestBlockEntity blockEntity) {
-                UnlimitedContainerUtils.dropContents(level, pos, blockEntity.container);
+                LimitlessContainerUtils.dropContents(level, pos, blockEntity.container);
                 level.updateNeighbourForOutputSignal(pos, this);
             }
 
@@ -77,10 +75,7 @@ public class NetherChestBlock extends EnderChestBlock {
             } else if (!NetherChested.CONFIG.get(ServerConfig.class).noBlockAbove || !level.getBlockState(above).isRedstoneConductor(level, above)) {
                 MenuProvider menuProvider = this.getMenuProvider(state, level, pos);
                 if (menuProvider != null) {
-                    OptionalInt containerId = player.openMenu(menuProvider);
-                    if (containerId.isPresent() && player.containerMenu.containerId == containerId.getAsInt()) {
-                        ((NetherChestMenu) player.containerMenu).setActualSynchronizer(new LimitlessContainerSynchronizer((ServerPlayer) player));
-                    }
+                    player.openMenu(menuProvider).ifPresent(containerId -> LimitlessContainerSynchronizer.setSynchronizerFor((ServerPlayer) player, containerId));
                     PiglinAi.angerNearbyPiglins(player, true);
                 }
 
@@ -96,8 +91,8 @@ public class NetherChestBlock extends EnderChestBlock {
 
     @Override
     @Nullable
-    public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level pLevel, BlockState pState, BlockEntityType<T> pBlockEntityType) {
-        return pLevel.isClientSide ? createTickerHelper(pBlockEntityType, ModRegistry.NETHER_CHEST_BLOCK_ENTITY_TYPE.get(), NetherChestBlockEntity::lidAnimateTick) : null;
+    public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState state, BlockEntityType<T> blockEntityType) {
+        return level.isClientSide ? createTickerHelper(blockEntityType, ModRegistry.NETHER_CHEST_BLOCK_ENTITY_TYPE.get(), NetherChestBlockEntity::lidAnimateTick) : null;
     }
 
     @Override
@@ -108,7 +103,7 @@ public class NetherChestBlock extends EnderChestBlock {
     @Override
     public int getAnalogOutputSignal(BlockState state, Level level, BlockPos pos) {
         if (level.getBlockEntity(pos) instanceof NetherChestBlockEntity blockEntity) {
-            return UnlimitedContainerUtils.getRedstoneSignalFromContainer(blockEntity.container);
+            return LimitlessContainerUtils.getRedstoneSignalFromContainer(blockEntity.container);
         }
         return 0;
     }
@@ -121,7 +116,7 @@ public class NetherChestBlock extends EnderChestBlock {
     }
 
     @Override
-    public void appendHoverText(ItemStack stack, @org.jetbrains.annotations.Nullable BlockGetter level, List<Component> tooltip, TooltipFlag flag) {
+    public void appendHoverText(ItemStack stack, @Nullable BlockGetter level, List<Component> tooltip, TooltipFlag flag) {
         tooltip.add(DESCRIPTION_COMPONENT);
     }
 

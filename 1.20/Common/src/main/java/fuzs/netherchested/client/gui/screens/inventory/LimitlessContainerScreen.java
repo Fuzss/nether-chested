@@ -6,7 +6,7 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.datafixers.util.Pair;
 import fuzs.netherchested.NetherChested;
 import fuzs.netherchested.network.client.ServerboundContainerClickMessage;
-import fuzs.netherchested.world.inventory.UnlimitedContainerUtils;
+import fuzs.netherchested.world.inventory.LimitlessContainerUtils;
 import fuzs.puzzlesaccessapi.api.client.container.v1.ExtendableContainerScreen;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
@@ -30,8 +30,8 @@ import java.util.List;
 
 public abstract class LimitlessContainerScreen<T extends AbstractContainerMenu> extends ExtendableContainerScreen<T> {
 
-    public LimitlessContainerScreen(T abstractContainerMenu, Inventory inventory, Component component) {
-        super(abstractContainerMenu, inventory, component);
+    public LimitlessContainerScreen(T menu, Inventory inventory, Component title) {
+        super(menu, inventory, title);
     }
 
     @Override
@@ -50,7 +50,7 @@ public abstract class LimitlessContainerScreen<T extends AbstractContainerMenu> 
     }
 
     @Override
-    protected void _renderFloatingItem(GuiGraphics guiGraphics, ItemStack itemStack, int i, int j, String string) {
+    protected void renderFloatingItem(GuiGraphics guiGraphics, ItemStack itemStack, int i, int j, String string) {
         guiGraphics.pose().pushPose();
         guiGraphics.pose().translate(0.0F, 0.0F, 232.0F);
         guiGraphics.renderItem(itemStack, i, j);
@@ -59,7 +59,7 @@ public abstract class LimitlessContainerScreen<T extends AbstractContainerMenu> 
     }
 
     @Override
-    protected void _renderSlot(GuiGraphics guiGraphics, Slot slot) {
+    protected void renderSlot(GuiGraphics guiGraphics, Slot slot) {
         int i = slot.x;
         int j = slot.y;
         ItemStack itemStack = slot.getItem();
@@ -75,10 +75,10 @@ public abstract class LimitlessContainerScreen<T extends AbstractContainerMenu> 
                 return;
             }
 
-            if (UnlimitedContainerUtils.canItemQuickReplace(slot, itemStack2, true) && this.menu.canDragTo(slot)) {
+            if (LimitlessContainerUtils.canItemQuickReplace(slot, itemStack2, true) && this.menu.canDragTo(slot)) {
                 itemStack = itemStack2.copy();
                 bl = true;
-                UnlimitedContainerUtils.getQuickCraftSlotCount(this.quickCraftSlots, this.getQuickCraftingType(), itemStack, slot.getItem().isEmpty() ? 0 : slot.getItem().getCount(), slot);
+                LimitlessContainerUtils.getQuickCraftSlotCount(this.quickCraftSlots, this.getQuickCraftingType(), itemStack, slot.getItem().isEmpty() ? 0 : slot.getItem().getCount(), slot);
                 int k = slot.getMaxStackSize(itemStack);
                 if (itemStack.getCount() > k) {
                     string = ChatFormatting.YELLOW.toString() + k;
@@ -86,7 +86,7 @@ public abstract class LimitlessContainerScreen<T extends AbstractContainerMenu> 
                 }
             } else {
                 this.quickCraftSlots.remove(slot);
-                this._recalculateQuickCraftRemaining();
+                this.recalculateQuickCraftRemaining(slot);
             }
         }
 
@@ -114,35 +114,33 @@ public abstract class LimitlessContainerScreen<T extends AbstractContainerMenu> 
         guiGraphics.pose().popPose();
     }
 
-    @Override
-    protected void _recalculateQuickCraftRemaining() {
+    private void recalculateQuickCraftRemaining(Slot slot) {
         ItemStack itemStack = this.menu.getCarried();
         if (!itemStack.isEmpty() && this.isQuickCrafting) {
             if (this.getQuickCraftingType() == 2) {
-                this.setQuickCraftingRemainder(itemStack.getMaxStackSize());
+                this.setQuickCraftingRemainder(slot.getMaxStackSize(itemStack));
             } else {
                 this.setQuickCraftingRemainder(itemStack.getCount());
 
-                for (Slot slot : this.quickCraftSlots) {
+                for (Slot quickCraftSlot : this.quickCraftSlots) {
                     ItemStack itemStack2 = itemStack.copy();
-                    ItemStack itemStack3 = slot.getItem();
+                    ItemStack itemStack3 = quickCraftSlot.getItem();
                     int i = itemStack3.isEmpty() ? 0 : itemStack3.getCount();
-                    UnlimitedContainerUtils.getQuickCraftSlotCount(this.quickCraftSlots, this.getQuickCraftingType(), itemStack2, i, slot);
-                    int j = slot.getMaxStackSize(itemStack2);
+                    LimitlessContainerUtils.getQuickCraftSlotCount(this.quickCraftSlots, this.getQuickCraftingType(), itemStack2, i, quickCraftSlot);
+                    int j = quickCraftSlot.getMaxStackSize(itemStack2);
                     if (itemStack2.getCount() > j) {
                         itemStack2.setCount(j);
                     }
 
                     this.setQuickCraftingRemainder(this.getQuickCraftingRemainder() - (itemStack2.getCount() - i));
                 }
-
             }
         }
     }
 
     @Override
     public boolean mouseDragged(double mouseX, double mouseY, int button, double dragX, double dragY) {
-        Slot slot = this._findSlot(mouseX, mouseY);
+        Slot slot = this.findSlot(mouseX, mouseY);
         ItemStack itemStack = this.menu.getCarried();
         if (this.getClickedSlot() != null && this.minecraft.options.touchscreen().get()) {
             if (button == 0 || button == 1) {
@@ -150,7 +148,7 @@ public abstract class LimitlessContainerScreen<T extends AbstractContainerMenu> 
                     if (slot != this.getClickedSlot() && !this.getClickedSlot().getItem().isEmpty()) {
                         this.setDraggingItem(this.getClickedSlot().getItem().copy());
                     }
-                } else if (this.getDraggingItem().getCount() > 1 && slot != null && UnlimitedContainerUtils.canItemQuickReplace(slot, this.getDraggingItem(), false)) {
+                } else if (this.getDraggingItem().getCount() > 1 && slot != null && LimitlessContainerUtils.canItemQuickReplace(slot, this.getDraggingItem(), false)) {
                     long l = Util.getMillis();
                     if (this.getQuickdropSlot() == slot) {
                         if (l - this.getQuickdropTime() > 500L) {
@@ -166,9 +164,9 @@ public abstract class LimitlessContainerScreen<T extends AbstractContainerMenu> 
                     }
                 }
             }
-        } else if (this.isQuickCrafting && slot != null && !itemStack.isEmpty() && (itemStack.getCount() > this.quickCraftSlots.size() || this.getQuickCraftingType() == 2) && UnlimitedContainerUtils.canItemQuickReplace(slot, itemStack, true) && slot.mayPlace(itemStack) && this.menu.canDragTo(slot)) {
+        } else if (this.isQuickCrafting && slot != null && !itemStack.isEmpty() && (itemStack.getCount() > this.quickCraftSlots.size() || this.getQuickCraftingType() == 2) && LimitlessContainerUtils.canItemQuickReplace(slot, itemStack, true) && slot.mayPlace(itemStack) && this.menu.canDragTo(slot)) {
             this.quickCraftSlots.add(slot);
-            this._recalculateQuickCraftRemaining();
+            this.recalculateQuickCraftRemaining(slot);
         }
 
         return true;
@@ -176,7 +174,7 @@ public abstract class LimitlessContainerScreen<T extends AbstractContainerMenu> 
 
     @Override
     public boolean mouseReleased(double mouseX, double mouseY, int button) {
-        Slot slot = this._findSlot(mouseX, mouseY);
+        Slot slot = this.findSlot(mouseX, mouseY);
         int i = this.leftPos;
         int j = this.topPos;
         boolean bl = this.hasClickedOutside(mouseX, mouseY, i, j, button);
@@ -193,7 +191,7 @@ public abstract class LimitlessContainerScreen<T extends AbstractContainerMenu> 
             if (hasShiftDown()) {
                 if (!this.getLastQuickMoved().isEmpty()) {
                     for (Slot slot2 : this.menu.slots) {
-                        if (slot2 != null && slot2.mayPickup(this.minecraft.player) && slot2.hasItem() && slot2.container == slot.container && UnlimitedContainerUtils.canItemQuickReplace(slot2, this.getLastQuickMoved(), true)) {
+                        if (slot2 != null && slot2.mayPickup(this.minecraft.player) && slot2.hasItem() && slot2.container == slot.container && LimitlessContainerUtils.canItemQuickReplace(slot2, this.getLastQuickMoved(), true)) {
                             this.slotClicked(slot2, slot2.index, button, ClickType.QUICK_MOVE);
                         }
                     }
@@ -223,7 +221,7 @@ public abstract class LimitlessContainerScreen<T extends AbstractContainerMenu> 
                         this.setDraggingItem(this.getClickedSlot().getItem());
                     }
 
-                    boolean bl2 = UnlimitedContainerUtils.canItemQuickReplace(slot, this.getDraggingItem(), false);
+                    boolean bl2 = LimitlessContainerUtils.canItemQuickReplace(slot, this.getDraggingItem(), false);
                     if (k != -1 && !this.getDraggingItem().isEmpty() && bl2) {
                         this.slotClicked(this.getClickedSlot(), this.getClickedSlot().index, button, ClickType.PICKUP);
                         this.slotClicked(slot, k, 0, ClickType.PICKUP);
