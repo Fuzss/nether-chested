@@ -4,14 +4,9 @@ dependencies {
     // Puzzles Lib
     modApi libs.puzzleslib.common
 
-    // Puzzles Access Api
-    compileOnly(libs.puzzlesaccessapi.common) {
-        transitive = false
-    }
-
     // Puzzles Api
     api(libs.puzzlesapi.common) {
-        transitive = false
+        exclude group: "fuzs.puzzleslib"
     }
 }
 

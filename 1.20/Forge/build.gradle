@@ -6,14 +6,9 @@ dependencies {
     // Puzzles Lib
     api(fg.deobf(libs.puzzleslib.forge.get()))
 
-    // Puzzles Access Api
-    compileOnly(fg.deobf(libs.puzzlesaccessapi.forge.get())) {
-        transitive = false
-    }
-
     // Puzzles Api
     api(fg.deobf(libs.puzzlesapi.forge.get())) {
-        transitive = false
+        exclude group: "fuzs.puzzleslib"
     }
     jarJar(fg.deobf(libs.puzzlesapi.forge.get()) {
         jarJar.ranged(it, "[${libs.versions.puzzlesapi.get()},)")
