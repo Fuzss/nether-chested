@@ -1,7 +1,7 @@
 package fuzs.netherchested;
 
 import fuzs.netherchested.init.ModRegistry;
-import fuzs.netherchested.world.inventory.LimitlessSlotStorage;
+import fuzs.puzzlesapi.api.limitlesscontainers.v1.LimitlessSlotStorage;
 import fuzs.puzzleslib.api.core.v1.ModConstructor;
 import net.fabricmc.api.ModInitializer;
 

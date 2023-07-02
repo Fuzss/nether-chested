@@ -37,7 +37,7 @@ ordering = "NONE"
 side = "BOTH"
 
 [[dependencies.${ modId }]]
-modId = "puzzlesaccessapi"
+modId = "puzzlesapi"
 mandatory = true
 versionRange = "*"
 ordering = "NONE"

@@ -3,6 +3,7 @@ package fuzs.netherchested.client.gui.screens.inventory;
 import com.mojang.blaze3d.systems.RenderSystem;
 import fuzs.netherchested.NetherChested;
 import fuzs.netherchested.world.inventory.NetherChestMenu;
+import fuzs.puzzlesapi.api.client.limitlesscontainers.v1.LimitlessContainerScreen;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;

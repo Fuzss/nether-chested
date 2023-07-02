@@ -3,9 +3,9 @@ package fuzs.netherchested.world.level.block;
 import fuzs.netherchested.NetherChested;
 import fuzs.netherchested.config.ServerConfig;
 import fuzs.netherchested.init.ModRegistry;
-import fuzs.netherchested.network.LimitlessContainerSynchronizer;
-import fuzs.netherchested.world.inventory.LimitlessContainerUtils;
 import fuzs.netherchested.world.level.block.entity.NetherChestBlockEntity;
+import fuzs.puzzlesapi.api.limitlesscontainers.v1.LimitlessContainerSynchronizer;
+import fuzs.puzzlesapi.api.limitlesscontainers.v1.LimitlessContainerUtils;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
@@ -122,16 +122,18 @@ public class NetherChestBlock extends EnderChestBlock {
 
     @Override
     public void animateTick(BlockState state, Level level, BlockPos pos, RandomSource random) {
-        // particle code from old Nether Chest mod as they look quite nice
-        if (random.nextInt(2) == 0) {
-            double posX = pos.getX() + 0.5D + (0.4375D * (random.nextInt(2) * 2 - 1));
-            double posY = pos.getY() + random.nextFloat();
-            double posZ = pos.getZ() + 0.5D + (0.4375D * (random.nextInt(2) * 2 - 1));
-            double ySpeed = random.nextFloat() * 0.015625D;
-            if (random.nextInt(7) == 0) {
-                level.addParticle(ParticleTypes.FLAME, posX, posY, posZ, 0, ySpeed * 4, 0);
-            } else {
-                level.addParticle(ParticleTypes.SMOKE, posX, posY, posZ, 0, ySpeed, 0);
+        if (!state.hasProperty(WATERLOGGED) || !state.getValue(WATERLOGGED)) {
+            // particle code from old Nether Chest mod as they look quite nice
+            if (random.nextInt(2) == 0) {
+                double posX = pos.getX() + 0.5D + (0.4375D * (random.nextInt(2) * 2 - 1));
+                double posY = pos.getY() + random.nextFloat();
+                double posZ = pos.getZ() + 0.5D + (0.4375D * (random.nextInt(2) * 2 - 1));
+                double ySpeed = random.nextFloat() * 0.015625D;
+                if (random.nextInt(7) == 0) {
+                    level.addParticle(ParticleTypes.FLAME, posX, posY, posZ, 0, ySpeed * 4, 0);
+                } else {
+                    level.addParticle(ParticleTypes.SMOKE, posX, posY, posZ, 0, ySpeed, 0);
+                }
             }
         }
     }

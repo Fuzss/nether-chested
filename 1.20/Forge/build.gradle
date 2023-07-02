@@ -7,9 +7,16 @@ dependencies {
     api(fg.deobf(libs.puzzleslib.forge.get()))
 
     // Puzzles Access Api
-    api(fg.deobf("fuzs.puzzlesaccessapi:puzzlesaccessapi-forge:8.0.5"))
-    jarJar(fg.deobf("fuzs.puzzlesaccessapi:puzzlesaccessapi-forge:8.0.5") {
-        jarJar.ranged(it, "[8.0.5,)")
+    compileOnly(fg.deobf(libs.puzzlesaccessapi.forge.get())) {
+        transitive = false
+    }
+
+    // Puzzles Api
+    api(fg.deobf(libs.puzzlesapi.forge.get())) {
+        transitive = false
+    }
+    jarJar(fg.deobf(libs.puzzlesapi.forge.get()) {
+        jarJar.ranged(it, "[${libs.versions.puzzlesapi.get()},)")
         transitive = false
     })
 

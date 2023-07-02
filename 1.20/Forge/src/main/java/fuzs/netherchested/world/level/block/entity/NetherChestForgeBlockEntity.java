@@ -1,6 +1,6 @@
 package fuzs.netherchested.world.level.block.entity;
 
-import fuzs.netherchested.world.inventory.LimitlessInvWrapper;
+import fuzs.puzzlesapi.api.limitlesscontainers.v1.LimitlessInvWrapper;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.block.state.BlockState;

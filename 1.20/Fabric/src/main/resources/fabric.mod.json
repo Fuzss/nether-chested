@@ -38,7 +38,7 @@
     "fabricloader": ">=${minFabricVersion}",
     "fabric-api": ">=${minFabricApiVersion}",
     "puzzleslib": ">=${minPuzzlesVersion}",
-    "puzzlesaccessapi": "*",
+    "puzzlesapi": "*",
     "minecraft": "${minecraftVersion}",
     "java": ">=17"
   }
