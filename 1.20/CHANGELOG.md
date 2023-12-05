@@ -3,6 +3,10 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog].
 
+## [v8.0.2-1.20.1] - 2023-12-05
+### Changed
+- Updated to Puzzles Api v8.1.4
+
 ## [v8.0.1-1.20.1] - 2023-07-02
 ### Changed
 - Migrate to Puzzles Api internally
