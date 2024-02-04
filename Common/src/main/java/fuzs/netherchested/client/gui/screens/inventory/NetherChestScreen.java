@@ -1,16 +1,16 @@
 package fuzs.netherchested.client.gui.screens.inventory;
 
 import com.mojang.blaze3d.systems.RenderSystem;
+import fuzs.limitlesscontainers.api.limitlesscontainers.v1.client.LimitlessContainerScreen;
 import fuzs.netherchested.NetherChested;
 import fuzs.netherchested.world.inventory.NetherChestMenu;
-import fuzs.puzzlesapi.api.client.limitlesscontainers.v1.LimitlessContainerScreen;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
 
 public class NetherChestScreen extends LimitlessContainerScreen<NetherChestMenu> {
-    private static final ResourceLocation CONTAINER_BACKGROUND = NetherChested.id("textures/gui/container/nether_chest.png");
+    public static final ResourceLocation CONTAINER_BACKGROUND = NetherChested.id("textures/gui/container/nether_chest.png");
 
     public NetherChestScreen(NetherChestMenu chestMenu, Inventory inventory, Component component) {
         super(chestMenu, inventory, component);
@@ -27,7 +27,6 @@ public class NetherChestScreen extends LimitlessContainerScreen<NetherChestMenu>
 
     @Override
     public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
-        this.renderBackground(guiGraphics);
         super.render(guiGraphics, mouseX, mouseY, partialTick);
         this.renderTooltip(guiGraphics, mouseX, mouseY);
     }

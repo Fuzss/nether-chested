@@ -19,19 +19,19 @@ public class NetherChestedClient implements ClientModConstructor {
 
     @Override
     public void onClientSetup() {
-        MenuScreens.register(ModRegistry.NETHER_CHEST_MENU_TYPE.get(), NetherChestScreen::new);
+        MenuScreens.register(ModRegistry.NETHER_CHEST_MENU_TYPE.value(), NetherChestScreen::new);
     }
 
     @Override
     public void onRegisterBlockEntityRenderers(BlockEntityRenderersContext context) {
-        context.registerBlockEntityRenderer(ModRegistry.NETHER_CHEST_BLOCK_ENTITY_TYPE.get(), ChestRenderer::new);
+        context.registerBlockEntityRenderer(ModRegistry.NETHER_CHEST_BLOCK_ENTITY_TYPE.value(), ChestRenderer::new);
     }
 
     @Override
     public void onRegisterBuiltinModelItemRenderers(BuiltinModelItemRendererContext context) {
-        NetherChestBlockEntity netherChest = new NetherChestBlockEntity(BlockPos.ZERO, ModRegistry.NETHER_CHEST_BLOCK.get().defaultBlockState());
+        NetherChestBlockEntity netherChest = new NetherChestBlockEntity(BlockPos.ZERO, ModRegistry.NETHER_CHEST_BLOCK.value().defaultBlockState());
         context.registerItemRenderer((ItemStack stack, ItemDisplayContext mode, PoseStack matrices, MultiBufferSource vertexConsumers, int light, int overlay) -> {
             Minecraft.getInstance().getBlockEntityRenderDispatcher().renderItem(netherChest, matrices, vertexConsumers, light, overlay);
-        }, ModRegistry.NETHER_CHEST_BLOCK.get());
+        }, ModRegistry.NETHER_CHEST_BLOCK.value());
     }
 }

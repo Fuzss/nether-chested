@@ -1,11 +1,13 @@
 package fuzs.netherchested.world.level.block;
 
+import fuzs.limitlesscontainers.api.limitlesscontainers.v1.LimitlessContainerSynchronizer;
+import fuzs.limitlesscontainers.api.limitlesscontainers.v1.LimitlessContainerUtils;
 import fuzs.netherchested.NetherChested;
 import fuzs.netherchested.config.ServerConfig;
 import fuzs.netherchested.init.ModRegistry;
 import fuzs.netherchested.world.level.block.entity.NetherChestBlockEntity;
-import fuzs.puzzlesapi.api.limitlesscontainers.v1.LimitlessContainerSynchronizer;
-import fuzs.puzzlesapi.api.limitlesscontainers.v1.LimitlessContainerUtils;
+import fuzs.puzzleslib.api.block.v1.entity.TickingEntityBlock;
+import fuzs.puzzleslib.api.core.v1.Proxy;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
@@ -34,10 +36,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
-@SuppressWarnings("deprecation")
-public class NetherChestBlock extends EnderChestBlock {
-    public static final String NETHER_CHEST_DESCRIPTION_KEY = "block.netherchested.nether_chest.description";
-    private static final Component DESCRIPTION_COMPONENT = Component.translatable(NETHER_CHEST_DESCRIPTION_KEY).withStyle(ChatFormatting.GOLD);
+public class NetherChestBlock extends EnderChestBlock implements TickingEntityBlock<NetherChestBlockEntity> {
 
     public NetherChestBlock(Properties properties) {
         super(properties);
@@ -53,46 +52,24 @@ public class NetherChestBlock extends EnderChestBlock {
     }
 
     @Override
+    public void appendHoverText(ItemStack stack, @Nullable BlockGetter level, List<Component> tooltip, TooltipFlag flag) {
+        tooltip.addAll(Proxy.INSTANCE.splitTooltipLines(this.getDescriptionComponent()));
+    }
+
+    public Component getDescriptionComponent() {
+        return Component.translatable(this.getDescriptionId() + ".description").withStyle(ChatFormatting.GOLD);
+    }
+
+    @Override
     public void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean isMoving) {
         if (!state.is(newState.getBlock())) {
             if (level.getBlockEntity(pos) instanceof NetherChestBlockEntity blockEntity) {
-                LimitlessContainerUtils.dropContents(level, pos, blockEntity.container);
+                LimitlessContainerUtils.dropContents(level, pos, blockEntity.getContainer());
                 level.updateNeighbourForOutputSignal(pos, this);
             }
 
             super.onRemove(state, level, pos, newState, isMoving);
         }
-    }
-
-    @Override
-    public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
-        if (!level.isClientSide) {
-            BlockPos above = pos.above();
-            if (level.dimension() == Level.NETHER && NetherChested.CONFIG.get(ServerConfig.class).explodeInNether) {
-                level.removeBlock(pos, false);
-                Vec3 center = pos.getCenter();
-                level.explode(null, level.damageSources().badRespawnPointExplosion(center), null, center, NetherChested.CONFIG.get(ServerConfig.class).netherExplosionStrength, true, Level.ExplosionInteraction.BLOCK);
-            } else if (!NetherChested.CONFIG.get(ServerConfig.class).noBlockAbove || !level.getBlockState(above).isRedstoneConductor(level, above)) {
-                MenuProvider menuProvider = this.getMenuProvider(state, level, pos);
-                if (menuProvider != null) {
-                    player.openMenu(menuProvider).ifPresent(containerId -> LimitlessContainerSynchronizer.setSynchronizerFor((ServerPlayer) player, containerId));
-                    PiglinAi.angerNearbyPiglins(player, true);
-                }
-
-            }
-        }
-        return InteractionResult.sidedSuccess(level.isClientSide);
-    }
-
-    @Override
-    public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
-        return ModRegistry.NETHER_CHEST_BLOCK_ENTITY_TYPE.get().create(pos, state);
-    }
-
-    @Override
-    @Nullable
-    public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState state, BlockEntityType<T> blockEntityType) {
-        return level.isClientSide ? createTickerHelper(blockEntityType, ModRegistry.NETHER_CHEST_BLOCK_ENTITY_TYPE.get(), NetherChestBlockEntity::lidAnimateTick) : null;
     }
 
     @Override
@@ -103,21 +80,50 @@ public class NetherChestBlock extends EnderChestBlock {
     @Override
     public int getAnalogOutputSignal(BlockState state, Level level, BlockPos pos) {
         if (level.getBlockEntity(pos) instanceof NetherChestBlockEntity blockEntity) {
-            return LimitlessContainerUtils.getRedstoneSignalFromContainer(blockEntity.container);
+            return LimitlessContainerUtils.getRedstoneSignalFromContainer(blockEntity.getContainer());
         }
         return 0;
     }
 
     @Override
-    public void tick(BlockState state, ServerLevel level, BlockPos pos, RandomSource random) {
-        if (level.getBlockEntity(pos) instanceof NetherChestBlockEntity blockEntity) {
-            blockEntity.recheckOpen();
+    public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
+        if (!level.isClientSide) {
+            BlockPos above = pos.above();
+            if (level.dimension() == Level.NETHER && NetherChested.CONFIG.get(ServerConfig.class).explodeInNether) {
+                level.removeBlock(pos, false);
+                Vec3 center = pos.getCenter();
+                level.explode(null,
+                        level.damageSources().badRespawnPointExplosion(center),
+                        null,
+                        center,
+                        NetherChested.CONFIG.get(ServerConfig.class).netherExplosionStrength,
+                        true,
+                        Level.ExplosionInteraction.BLOCK
+                );
+            } else if (!NetherChested.CONFIG.get(ServerConfig.class).noBlockAbove ||
+                    !level.getBlockState(above).isRedstoneConductor(level, above)) {
+                MenuProvider menuProvider = this.getMenuProvider(state, level, pos);
+                if (menuProvider != null) {
+                    LimitlessContainerSynchronizer.setSynchronizerFor((ServerPlayer) player,
+                            player.openMenu(menuProvider).orElse(-1)
+                    );
+                    PiglinAi.angerNearbyPiglins(player, true);
+                }
+
+            }
         }
+        return InteractionResult.sidedSuccess(level.isClientSide);
     }
 
     @Override
-    public void appendHoverText(ItemStack stack, @Nullable BlockGetter level, List<Component> tooltip, TooltipFlag flag) {
-        tooltip.add(DESCRIPTION_COMPONENT);
+    public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
+        return TickingEntityBlock.super.newBlockEntity(pos, state);
+    }
+
+    @Nullable
+    @Override
+    public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState state, BlockEntityType<T> blockEntityType) {
+        return TickingEntityBlock.super.getTicker(level, state, blockEntityType);
     }
 
     @Override
@@ -136,5 +142,17 @@ public class NetherChestBlock extends EnderChestBlock {
                 }
             }
         }
+    }
+
+    @Override
+    public void tick(BlockState state, ServerLevel level, BlockPos pos, RandomSource random) {
+        if (level.getBlockEntity(pos) instanceof NetherChestBlockEntity blockEntity) {
+            blockEntity.recheckOpen();
+        }
+    }
+
+    @Override
+    public BlockEntityType<? extends NetherChestBlockEntity> getBlockEntityType() {
+        return ModRegistry.NETHER_CHEST_BLOCK_ENTITY_TYPE.value();
     }
 }

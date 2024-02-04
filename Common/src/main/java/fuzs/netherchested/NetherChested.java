@@ -25,7 +25,7 @@ public class NetherChested implements ModConstructor {
     @Override
     public void onBuildCreativeModeTabContents(BuildCreativeModeTabContentsContext context) {
         context.registerBuildListener(CreativeModeTabs.FUNCTIONAL_BLOCKS, (itemDisplayParameters, output) -> {
-            output.accept(ModRegistry.NETHER_CHEST_ITEM.get());
+            output.accept(ModRegistry.NETHER_CHEST_ITEM.value());
         });
     }
 
