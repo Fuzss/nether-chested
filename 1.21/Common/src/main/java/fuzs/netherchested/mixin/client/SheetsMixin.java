@@ -10,20 +10,12 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-
-import java.util.function.Consumer;
 
 @Mixin(Sheets.class)
 abstract class SheetsMixin {
     @Unique
     private static final Material NETHERCHESTED$NETHER_CHEST_LOCATION = new Material(Sheets.CHEST_SHEET, NetherChested.id("entity/chest/nether"));
-
-    @Inject(method = "getAllMaterials", at = @At("TAIL"))
-    private static void getAllMaterials(Consumer<Material> materialConsumer, CallbackInfo callback) {
-        materialConsumer.accept(NETHERCHESTED$NETHER_CHEST_LOCATION);
-    }
 
     @Inject(method = "chooseMaterial", at = @At("HEAD"), cancellable = true)
     private static void chooseMaterial(BlockEntity blockEntity, ChestType chestType, boolean holiday, CallbackInfoReturnable<Material> callback) {

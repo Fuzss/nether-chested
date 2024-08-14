@@ -15,8 +15,10 @@ import net.minecraft.world.level.block.Blocks;
 import java.util.Optional;
 
 public class ModModelProvider extends AbstractModelProvider {
-    public static final ModelTemplate CHEST_TEMPLATE = new ModelTemplate(Optional.of(decorateItemModelLocation(
-            NetherChested.id("template_chest"))), Optional.empty(), TextureSlot.PARTICLE);
+    public static final ModelTemplate CHEST_TEMPLATE = new ModelTemplate(
+            Optional.of(decorateItemModelLocation(NetherChested.id("template_chest"))), Optional.empty(),
+            TextureSlot.PARTICLE
+    );
 
     public ModModelProvider(DataProviderContext context) {
         super(context);
@@ -32,8 +34,7 @@ public class ModModelProvider extends AbstractModelProvider {
     @Override
     public void addItemModels(ItemModelGenerators builder) {
         CHEST_TEMPLATE.create(ModelLocationUtils.getModelLocation(ModRegistry.NETHER_CHEST_ITEM.value()),
-                TextureMapping.particle(Blocks.NETHER_BRICKS),
-                builder.output
+                TextureMapping.particle(Blocks.NETHER_BRICKS), builder.output
         );
     }
 }

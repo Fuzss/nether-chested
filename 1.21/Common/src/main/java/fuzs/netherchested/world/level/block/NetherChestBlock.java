@@ -5,7 +5,9 @@ import fuzs.limitlesscontainers.api.limitlesscontainers.v1.LimitlessContainerUti
 import fuzs.netherchested.NetherChested;
 import fuzs.netherchested.config.ServerConfig;
 import fuzs.netherchested.init.ModRegistry;
+import fuzs.netherchested.world.level.block.entity.NamedBlockEntity;
 import fuzs.netherchested.world.level.block.entity.NetherChestBlockEntity;
+import fuzs.puzzleslib.api.block.v1.entity.BlockEntityHelper;
 import fuzs.puzzleslib.api.block.v1.entity.TickingEntityBlock;
 import fuzs.puzzleslib.api.core.v1.Proxy;
 import net.minecraft.ChatFormatting;
@@ -15,15 +17,14 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.RandomSource;
-import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.monster.piglin.PiglinAi;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
-import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.EnderChestBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -44,16 +45,12 @@ public class NetherChestBlock extends EnderChestBlock implements TickingEntityBl
 
     @Override
     public void setPlacedBy(Level level, BlockPos pos, BlockState state, LivingEntity placer, ItemStack stack) {
-        if (stack.hasCustomHoverName()) {
-            if (level.getBlockEntity(pos) instanceof NetherChestBlockEntity blockEntity) {
-                blockEntity.setCustomName(stack.getHoverName());
-            }
-        }
+        BlockEntityHelper.setCustomName(stack, level, pos, NetherChestBlockEntity.class, NamedBlockEntity::setCustomName);
     }
 
     @Override
-    public void appendHoverText(ItemStack stack, @Nullable BlockGetter level, List<Component> tooltip, TooltipFlag flag) {
-        tooltip.addAll(Proxy.INSTANCE.splitTooltipLines(this.getDescriptionComponent()));
+    public void appendHoverText(ItemStack stack, Item.TooltipContext context, List<Component> tooltipComponents, TooltipFlag tooltipFlag) {
+        tooltipComponents.addAll(Proxy.INSTANCE.splitTooltipLines(this.getDescriptionComponent()));
     }
 
     public Component getDescriptionComponent() {
@@ -81,12 +78,13 @@ public class NetherChestBlock extends EnderChestBlock implements TickingEntityBl
     public int getAnalogOutputSignal(BlockState state, Level level, BlockPos pos) {
         if (level.getBlockEntity(pos) instanceof NetherChestBlockEntity blockEntity) {
             return LimitlessContainerUtils.getRedstoneSignalFromContainer(blockEntity.getContainer());
+        } else {
+            return 0;
         }
-        return 0;
     }
 
     @Override
-    public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
+    protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hitResult) {
         if (!level.isClientSide) {
             BlockPos above = pos.above();
             if (level.dimension() == Level.NETHER && NetherChested.CONFIG.get(ServerConfig.class).explodeInNether) {

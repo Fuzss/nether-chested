@@ -18,6 +18,7 @@
     "@#@"
   ],
   "result": {
-    "item": "netherchested:nether_chest"
+    "count": 1,
+    "id": "netherchested:nether_chest"
   }
 }

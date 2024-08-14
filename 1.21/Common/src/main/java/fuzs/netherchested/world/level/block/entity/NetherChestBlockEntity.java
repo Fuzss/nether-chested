@@ -7,8 +7,10 @@ import fuzs.netherchested.config.ServerConfig;
 import fuzs.netherchested.init.ModRegistry;
 import fuzs.netherchested.world.inventory.NetherChestMenu;
 import fuzs.puzzleslib.api.block.v1.entity.TickingBlockEntity;
-import fuzs.puzzleslib.api.container.v1.ContainerImpl;
+import fuzs.puzzleslib.api.container.v1.ContainerMenuHelper;
+import fuzs.puzzleslib.api.container.v1.ListBackedContainer;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.core.NonNullList;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
@@ -63,22 +65,32 @@ public class NetherChestBlockEntity extends NamedBlockEntity implements LidBlock
     }
 
     @Override
-    public void load(CompoundTag tag) {
-        super.load(tag);
+    public void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
+        super.loadAdditional(tag, registries);
         this.items.clear();
-        LimitlessContainerUtils.loadAllItems(tag, this.items);
+        LimitlessContainerUtils.loadAllItems(tag, this.items, registries);
 
     }
 
     @Override
-    protected void saveAdditional(CompoundTag tag) {
-        super.saveAdditional(tag);
-        LimitlessContainerUtils.saveAllItems(tag, this.items, true);
+    protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
+        super.saveAdditional(tag, registries);
+        LimitlessContainerUtils.saveAllItems(tag, this.items, true, registries);
     }
 
     @Override
     protected Component getDefaultName() {
         return CONTAINER_TITLE;
+    }
+
+    @Override
+    protected NonNullList<ItemStack> getItems() {
+        return this.items;
+    }
+
+    @Override
+    protected void setItems(NonNullList<ItemStack> items) {
+        ContainerMenuHelper.copyItemsIntoList(items, this.items);
     }
 
     @Override
@@ -96,10 +108,10 @@ public class NetherChestBlockEntity extends NamedBlockEntity implements LidBlock
         return this.container;
     }
 
-    private class NetherChestContainer implements ContainerImpl, MultipliedContainer {
+    private class NetherChestContainer implements ListBackedContainer, MultipliedContainer {
 
         @Override
-        public NonNullList<ItemStack> getItems() {
+        public NonNullList<ItemStack> getContainerItems() {
             return NetherChestBlockEntity.this.items;
         }
 

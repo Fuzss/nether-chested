@@ -20,18 +20,15 @@ public class ModRegistry {
             () -> new NetherChestBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.ENDER_CHEST))
     );
     public static final Holder.Reference<Item> NETHER_CHEST_ITEM = REGISTRY.registerBlockItem(NETHER_CHEST_BLOCK);
-
-    public static void touch() {
-
-    }    public static final Holder.Reference<BlockEntityType<NetherChestBlockEntity>> NETHER_CHEST_BLOCK_ENTITY_TYPE = REGISTRY.whenNotOn(
+    public static final Holder.Reference<BlockEntityType<NetherChestBlockEntity>> NETHER_CHEST_BLOCK_ENTITY_TYPE = REGISTRY.whenNotOn(
                     ModLoader.FORGE)
             .registerBlockEntityType("nether_chest",
                     () -> BlockEntityType.Builder.of(NetherChestBlockEntity::new, NETHER_CHEST_BLOCK.value())
             );
     public static final Holder.Reference<MenuType<NetherChestMenu>> NETHER_CHEST_MENU_TYPE = REGISTRY.registerMenuType(
-            "nether_chest",
-            () -> NetherChestMenu::new
-    );
+            "nether_chest", () -> NetherChestMenu::new);
 
-
+    public static void touch() {
+        // NO-OP
+    }
 }

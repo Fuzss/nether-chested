@@ -8,6 +8,7 @@ import fuzs.netherchested.NetherChested;
 import fuzs.netherchested.config.ServerConfig;
 import fuzs.netherchested.init.ModRegistry;
 import fuzs.netherchested.world.level.block.entity.NetherChestBlockEntity;
+import fuzs.puzzleslib.api.container.v1.ContainerMenuHelper;
 import net.minecraft.world.Container;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
@@ -16,11 +17,10 @@ import net.minecraft.world.item.ItemStack;
 
 public class NetherChestMenu extends LimitlessContainerMenu {
     private final int containerRows = 6;
-    private final Container container;
+    private final MultipliedContainer container;
 
     public NetherChestMenu(int containerId, Inventory inventory) {
-        this(containerId,
-                inventory,
+        this(containerId, inventory,
                 new MultipliedSimpleContainer(NetherChested.CONFIG.get(ServerConfig.class).stackSizeMultiplier,
                         NetherChestBlockEntity.CONTAINER_SIZE
                 )
@@ -32,27 +32,15 @@ public class NetherChestMenu extends LimitlessContainerMenu {
         checkContainerSize(container, this.containerRows * 9);
         this.container = container;
         container.startOpen(inventory.player);
-        this.addContainerSlots(container);
-        this.addInventorySlots(inventory);
+        this.addContainerSlots();
+        ContainerMenuHelper.addInventorySlots(this, inventory, 103 + 6 + (this.containerRows - 4) * 18);
     }
 
-    private void addContainerSlots(MultipliedContainer container) {
+    private void addContainerSlots() {
         for (int l = 0; l < this.containerRows; ++l) {
             for (int m = 0; m < 9; ++m) {
-                this.addSlot(new MultipliedSlot(container, m + l * 9, 8 + m * 18, 18 + 1 + l * 18));
+                this.addSlot(new MultipliedSlot(this.container, m + l * 9, 8 + m * 18, 18 + 1 + l * 18));
             }
-        }
-    }
-
-    private void addInventorySlots(Inventory inventory) {
-        int containerRowHeight = (this.containerRows - 4) * 18;
-        for (int l = 0; l < 3; ++l) {
-            for (int m = 0; m < 9; ++m) {
-                this.addSlot(new Slot(inventory, m + l * 9 + 9, 8 + m * 18, 103 + 6 + l * 18 + containerRowHeight));
-            }
-        }
-        for (int l = 0; l < 9; ++l) {
-            this.addSlot(new Slot(inventory, l, 8 + l * 18, 161 + 6 + containerRowHeight));
         }
     }
 
@@ -60,7 +48,7 @@ public class NetherChestMenu extends LimitlessContainerMenu {
     public ItemStack quickMoveStack(Player player, int index) {
         ItemStack itemStack = ItemStack.EMPTY;
         Slot slot = this.slots.get(index);
-        if (slot != null && slot.hasItem()) {
+        if (slot.hasItem()) {
             ItemStack itemStack2 = slot.getItem();
             itemStack = itemStack2.copy();
             if (index < this.containerRows * 9) {

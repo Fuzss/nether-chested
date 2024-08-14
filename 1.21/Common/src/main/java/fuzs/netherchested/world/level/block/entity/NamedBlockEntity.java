@@ -1,6 +1,10 @@
 package fuzs.netherchested.world.level.block.entity;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.core.NonNullList;
+import net.minecraft.core.component.DataComponentMap;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.Component.Serializer;
@@ -12,6 +16,8 @@ import net.minecraft.world.Nameable;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.component.ItemContainerContents;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
@@ -32,23 +38,21 @@ public abstract class NamedBlockEntity extends BlockEntity implements MenuProvid
     }
 
     @Override
-    public void load(CompoundTag tag) {
-        super.load(tag);
+    public void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
+        super.loadAdditional(tag, registries);
         this.lockKey = LockCode.fromTag(tag);
         if (tag.contains("CustomName", 8)) {
-            this.name = Serializer.fromJson(tag.getString("CustomName"));
+            this.name = parseCustomNameSafe(tag.getString("CustomName"), registries);
         }
-
     }
 
     @Override
-    protected void saveAdditional(CompoundTag tag) {
-        super.saveAdditional(tag);
+    protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
+        super.saveAdditional(tag, registries);
         this.lockKey.addToTag(tag);
         if (this.name != null) {
-            tag.putString("CustomName", Serializer.toJson(this.name));
+            tag.putString("CustomName", Serializer.toJson(this.name, registries));
         }
-
     }
 
     public void setCustomName(Component name) {
@@ -87,6 +91,10 @@ public abstract class NamedBlockEntity extends BlockEntity implements MenuProvid
         }
     }
 
+    protected abstract NonNullList<ItemStack> getItems();
+
+    protected abstract void setItems(NonNullList<ItemStack> items);
+
     @Override
     @Nullable
     public AbstractContainerMenu createMenu(int i, Inventory inventory, Player player) {
@@ -94,4 +102,29 @@ public abstract class NamedBlockEntity extends BlockEntity implements MenuProvid
     }
 
     protected abstract AbstractContainerMenu createMenu(int containerId, Inventory inventory);
+    @Override
+    protected void applyImplicitComponents(BlockEntity.DataComponentInput componentInput) {
+        super.applyImplicitComponents(componentInput);
+        this.name = componentInput.get(DataComponents.CUSTOM_NAME);
+        this.lockKey = componentInput.getOrDefault(DataComponents.LOCK, LockCode.NO_LOCK);
+        componentInput.getOrDefault(DataComponents.CONTAINER, ItemContainerContents.EMPTY).copyInto(this.getItems());
+    }
+
+    @Override
+    protected void collectImplicitComponents(DataComponentMap.Builder components) {
+        super.collectImplicitComponents(components);
+        components.set(DataComponents.CUSTOM_NAME, this.name);
+        if (!this.lockKey.equals(LockCode.NO_LOCK)) {
+            components.set(DataComponents.LOCK, this.lockKey);
+        }
+
+        components.set(DataComponents.CONTAINER, ItemContainerContents.fromItems(this.getItems()));
+    }
+
+    @Override
+    public void removeComponentsFromTag(CompoundTag tag) {
+        tag.remove("CustomName");
+        tag.remove("Lock");
+        tag.remove("Items");
+    }
 }
