@@ -6,10 +6,10 @@
       "item": "minecraft:nether_bricks"
     },
     "+": {
-      "item": "minecraft:nether_star"
+      "item": "minecraft:chest"
     },
     "@": {
-      "item": "minecraft:blaze_rod"
+      "item": "minecraft:netherite_scrap"
     }
   },
   "pattern": [

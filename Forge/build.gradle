@@ -1,4 +1,4 @@
-apply from: 'https://raw.githubusercontent.com/Fuzss/modresources/main/gradle/forge.gradle'
+apply from: 'https://raw.githubusercontent.com/Fuzss/modresources/main/gradle/v1/forge.gradle'
 
 def versionCatalog = extensions.getByType(VersionCatalogsExtension).named("libs")
 
@@ -29,7 +29,7 @@ dependencies {
     }
 }
 
-task signJar(type: net.minecraftforge.gradle.common.tasks.SignJar, dependsOn: tasks.reobfJarJar) {
+task signJar(type: net.minecraftforge.gradle.common.tasks.SignJar) {
     onlyIf { project.hasProperty('keyStore') }
     keyStore = project.findProperty('keyStore')
     alias = project.findProperty('keyStoreAlias')
@@ -38,5 +38,6 @@ task signJar(type: net.minecraftforge.gradle.common.tasks.SignJar, dependsOn: ta
     inputFile = outputFile = tasks.jarJar.archivePath
 }
 
+signJar.dependsOn 'reobfJarJar'
 jar.finalizedBy 'signJar'
 signJar.mustRunAfter 'reobfJar'

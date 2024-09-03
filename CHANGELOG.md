@@ -3,6 +3,11 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog].
 
+## [v8.0.4-1.20.1] - 2024-09-03
+### Changed
+- Update to Puzzles Api v8.1.7
+- Adjust nether chest recipe to no longer require a nether star, but netherite scrap instead
+
 ## [v8.0.3-1.20.1] - 2024-01-24
 ### Changed
 - Update to Puzzles Api v8.1.5
