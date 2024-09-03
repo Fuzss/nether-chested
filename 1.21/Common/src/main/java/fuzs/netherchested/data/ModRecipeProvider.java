@@ -18,12 +18,12 @@ public class ModRecipeProvider extends AbstractRecipeProvider {
     public void addRecipes(RecipeOutput recipeOutput) {
         ShapedRecipeBuilder.shaped(RecipeCategory.DECORATIONS, ModRegistry.NETHER_CHEST_BLOCK.value())
                 .define('#', Items.NETHER_BRICKS)
-                .define('@', Items.BLAZE_ROD)
-                .define('+', Items.NETHER_STAR)
+                .define('@', Items.NETHERITE_SCRAP)
+                .define('+', Items.CHEST)
                 .pattern("@#@")
                 .pattern("#+#")
                 .pattern("@#@")
-                .unlockedBy(getHasName(Items.NETHER_STAR), has(Items.NETHER_STAR))
+                .unlockedBy(getHasName(Items.NETHERITE_SCRAP), has(Items.NETHERITE_SCRAP))
                 .save(recipeOutput);
     }
 }
