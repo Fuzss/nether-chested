@@ -1,5 +1,6 @@
 package fuzs.netherchested.world.level.block;
 
+import com.mojang.serialization.MapCodec;
 import fuzs.limitlesscontainers.api.limitlesscontainers.v1.LimitlessContainerSynchronizer;
 import fuzs.limitlesscontainers.api.limitlesscontainers.v1.LimitlessContainerUtils;
 import fuzs.netherchested.NetherChested;
@@ -29,15 +30,20 @@ import net.minecraft.world.level.block.entity.BlockEntityTicker;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
-import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
 public class NetherChestBlock extends EnderChestBlock implements TickingEntityBlock<NetherChestBlockEntity> {
+    public static final MapCodec<EnderChestBlock> CODEC = simpleCodec(NetherChestBlock::new);
 
     public NetherChestBlock(Properties properties) {
         super(properties);
+    }
+
+    @Override
+    public MapCodec<EnderChestBlock> codec() {
+        return CODEC;
     }
 
     @Override
@@ -77,21 +83,19 @@ public class NetherChestBlock extends EnderChestBlock implements TickingEntityBl
 
     @Override
     protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hitResult) {
-        if (!level.isClientSide) {
-            BlockPos above = pos.above();
-            if (level.dimension() == Level.NETHER && NetherChested.CONFIG.get(ServerConfig.class).explodeInNether) {
+        if (level.getBlockState(pos.above()).isRedstoneConductor(level, pos.above())) {
+            return InteractionResult.sidedSuccess(level.isClientSide);
+        } else if (level.isClientSide) {
+            return InteractionResult.SUCCESS;
+        } else {
+            if (level.dimension() == Level.NETHER && NetherChested.CONFIG.get(
+                    ServerConfig.class).netherExplosionStrength > 0) {
                 level.removeBlock(pos, false);
-                Vec3 center = pos.getCenter();
-                level.explode(null,
-                        level.damageSources().badRespawnPointExplosion(center),
-                        null,
-                        center,
-                        NetherChested.CONFIG.get(ServerConfig.class).netherExplosionStrength,
-                        true,
+                level.explode(null, level.damageSources().badRespawnPointExplosion(pos.getCenter()), null,
+                        pos.getCenter(), NetherChested.CONFIG.get(ServerConfig.class).netherExplosionStrength, true,
                         Level.ExplosionInteraction.BLOCK
                 );
-            } else if (!NetherChested.CONFIG.get(ServerConfig.class).noBlockAbove ||
-                    !level.getBlockState(above).isRedstoneConductor(level, above)) {
+            } else {
                 MenuProvider menuProvider = this.getMenuProvider(state, level, pos);
                 if (menuProvider != null) {
                     LimitlessContainerSynchronizer.setSynchronizerFor((ServerPlayer) player,
@@ -101,8 +105,9 @@ public class NetherChestBlock extends EnderChestBlock implements TickingEntityBl
                 }
 
             }
+
+            return InteractionResult.CONSUME;
         }
-        return InteractionResult.sidedSuccess(level.isClientSide);
     }
 
     @Override
