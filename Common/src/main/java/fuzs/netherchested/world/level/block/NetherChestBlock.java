@@ -9,6 +9,7 @@ import fuzs.netherchested.init.ModRegistry;
 import fuzs.netherchested.world.level.block.entity.NetherChestBlockEntity;
 import fuzs.puzzleslib.api.block.v1.entity.TickingEntityBlock;
 import fuzs.puzzleslib.api.core.v1.Proxy;
+import fuzs.puzzleslib.api.util.v1.InteractionResultHelper;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
@@ -84,7 +85,7 @@ public class NetherChestBlock extends EnderChestBlock implements TickingEntityBl
     @Override
     protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hitResult) {
         if (level.getBlockState(pos.above()).isRedstoneConductor(level, pos.above())) {
-            return InteractionResult.sidedSuccess(level.isClientSide);
+            return InteractionResultHelper.sidedSuccess(level.isClientSide);
         } else if (level.isClientSide) {
             return InteractionResult.SUCCESS;
         } else {
@@ -101,7 +102,7 @@ public class NetherChestBlock extends EnderChestBlock implements TickingEntityBl
                     LimitlessContainerSynchronizer.setSynchronizerFor((ServerPlayer) player,
                             player.openMenu(menuProvider).orElse(-1)
                     );
-                    PiglinAi.angerNearbyPiglins(player, true);
+                    PiglinAi.angerNearbyPiglins((ServerLevel) level, player, true);
                 }
 
             }

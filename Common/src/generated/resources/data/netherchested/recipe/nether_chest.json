@@ -2,15 +2,9 @@
   "type": "minecraft:crafting_shaped",
   "category": "misc",
   "key": {
-    "#": {
-      "item": "minecraft:nether_bricks"
-    },
-    "+": {
-      "item": "minecraft:chest"
-    },
-    "@": {
-      "item": "minecraft:netherite_scrap"
-    }
+    "#": "minecraft:nether_bricks",
+    "+": "minecraft:chest",
+    "@": "minecraft:netherite_scrap"
   },
   "pattern": [
     "@#@",

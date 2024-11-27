@@ -16,14 +16,14 @@ public class ModRecipeProvider extends AbstractRecipeProvider {
 
     @Override
     public void addRecipes(RecipeOutput recipeOutput) {
-        ShapedRecipeBuilder.shaped(RecipeCategory.DECORATIONS, ModRegistry.NETHER_CHEST_BLOCK.value())
+        ShapedRecipeBuilder.shaped(this.items(), RecipeCategory.DECORATIONS, ModRegistry.NETHER_CHEST_BLOCK.value())
                 .define('#', Items.NETHER_BRICKS)
                 .define('@', Items.NETHERITE_SCRAP)
                 .define('+', Items.CHEST)
                 .pattern("@#@")
                 .pattern("#+#")
                 .pattern("@#@")
-                .unlockedBy(getHasName(Items.NETHERITE_SCRAP), has(Items.NETHERITE_SCRAP))
+                .unlockedBy(getHasName(Items.NETHERITE_SCRAP), this.has(Items.NETHERITE_SCRAP))
                 .save(recipeOutput);
     }
 }

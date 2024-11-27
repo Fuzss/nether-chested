@@ -40,7 +40,7 @@ public abstract class NamedBlockEntity extends BlockEntity implements MenuProvid
     @Override
     public void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         super.loadAdditional(tag, registries);
-        this.lockKey = LockCode.fromTag(tag);
+        this.lockKey = LockCode.fromTag(tag, registries);
         if (tag.contains("CustomName", 8)) {
             this.name = parseCustomNameSafe(tag.getString("CustomName"), registries);
         }
@@ -49,7 +49,7 @@ public abstract class NamedBlockEntity extends BlockEntity implements MenuProvid
     @Override
     protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         super.saveAdditional(tag, registries);
-        this.lockKey.addToTag(tag);
+        this.lockKey.addToTag(tag, registries);
         if (this.name != null) {
             tag.putString("CustomName", Serializer.toJson(this.name, registries));
         }
