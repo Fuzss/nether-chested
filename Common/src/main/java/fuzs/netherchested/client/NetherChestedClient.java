@@ -1,25 +1,20 @@
 package fuzs.netherchested.client;
 
-import com.mojang.blaze3d.vertex.PoseStack;
 import fuzs.netherchested.client.gui.screens.inventory.NetherChestScreen;
+import fuzs.netherchested.client.renderer.blockentity.NetherChestRenderer;
 import fuzs.netherchested.init.ModRegistry;
-import fuzs.netherchested.world.level.block.entity.NetherChestBlockEntity;
 import fuzs.puzzleslib.api.client.core.v1.ClientModConstructor;
 import fuzs.puzzleslib.api.client.core.v1.context.BlockEntityRenderersContext;
-import fuzs.puzzleslib.api.client.core.v1.context.BuiltinModelItemRendererContext;
+import fuzs.puzzleslib.api.client.core.v1.context.LayerDefinitionsContext;
 import fuzs.puzzleslib.api.client.core.v1.context.MenuScreensContext;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.blockentity.ChestRenderer;
-import net.minecraft.core.BlockPos;
-import net.minecraft.world.item.ItemDisplayContext;
-import net.minecraft.world.item.ItemStack;
+import net.minecraft.client.model.ChestModel;
 
 public class NetherChestedClient implements ClientModConstructor {
 
     @Override
     public void onRegisterBlockEntityRenderers(BlockEntityRenderersContext context) {
-        context.registerBlockEntityRenderer(ModRegistry.NETHER_CHEST_BLOCK_ENTITY_TYPE.value(), ChestRenderer::new);
+        context.registerBlockEntityRenderer(ModRegistry.NETHER_CHEST_BLOCK_ENTITY_TYPE.value(),
+                NetherChestRenderer::new);
     }
 
     @Override
@@ -28,14 +23,8 @@ public class NetherChestedClient implements ClientModConstructor {
     }
 
     @Override
-    public void onRegisterBuiltinModelItemRenderers(BuiltinModelItemRendererContext context) {
-        NetherChestBlockEntity netherChest = new NetherChestBlockEntity(BlockPos.ZERO,
-                ModRegistry.NETHER_CHEST_BLOCK.value().defaultBlockState()
-        );
-        context.registerItemRenderer((ItemStack stack, ItemDisplayContext mode, PoseStack matrices, MultiBufferSource vertexConsumers, int light, int overlay) -> {
-            Minecraft.getInstance()
-                    .getBlockEntityRenderDispatcher()
-                    .renderItem(netherChest, matrices, vertexConsumers, light, overlay);
-        }, ModRegistry.NETHER_CHEST_BLOCK.value());
+    public void onRegisterLayerDefinitions(LayerDefinitionsContext context) {
+        context.registerLayerDefinition(NetherChestRenderer.NETHER_CHEST_MODEL_LAYER_LOCATION,
+                ChestModel::createSingleBodyLayer);
     }
 }

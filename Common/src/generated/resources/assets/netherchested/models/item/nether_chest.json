@@ -1,5 +1,5 @@
 {
-  "parent": "netherchested:item/template_chest",
+  "parent": "minecraft:item/template_chest",
   "textures": {
     "particle": "minecraft:block/nether_bricks"
   }

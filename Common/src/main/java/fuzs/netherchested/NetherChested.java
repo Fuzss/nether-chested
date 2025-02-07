@@ -4,9 +4,10 @@ import fuzs.netherchested.config.ServerConfig;
 import fuzs.netherchested.init.ModRegistry;
 import fuzs.puzzleslib.api.config.v3.ConfigHolder;
 import fuzs.puzzleslib.api.core.v1.ModConstructor;
-import fuzs.puzzleslib.api.core.v1.context.BuildCreativeModeTabContentsContext;
 import fuzs.puzzleslib.api.core.v1.utility.ResourceLocationHelper;
+import fuzs.puzzleslib.api.event.v1.BuildCreativeModeTabContentsCallback;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.CreativeModeTabs;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,13 +22,14 @@ public class NetherChested implements ModConstructor {
     @Override
     public void onConstructMod() {
         ModRegistry.bootstrap();
+        registerEventHandlers();
     }
 
-    @Override
-    public void onBuildCreativeModeTabContents(BuildCreativeModeTabContentsContext context) {
-        context.registerBuildListener(CreativeModeTabs.FUNCTIONAL_BLOCKS, (itemDisplayParameters, output) -> {
-            output.accept(ModRegistry.NETHER_CHEST_ITEM.value());
-        });
+    private static void registerEventHandlers() {
+        BuildCreativeModeTabContentsCallback.buildCreativeModeTabContents(CreativeModeTabs.FUNCTIONAL_BLOCKS)
+                .register((CreativeModeTab creativeModeTab, CreativeModeTab.ItemDisplayParameters itemDisplayParameters, CreativeModeTab.Output output) -> {
+                    output.accept(ModRegistry.NETHER_CHEST_ITEM.value());
+                });
     }
 
     public static ResourceLocation id(String path) {
