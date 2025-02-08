@@ -23,7 +23,7 @@ public class NetherChestRenderer extends SingleChestRenderer<NetherChestBlockEnt
     }
 
     @Override
-    protected Material getChestMaterial(NetherChestBlockEntity netherChestBlockEntity, boolean b) {
-        return NETHER_CHEST_LOCATION;
+    protected Material getChestMaterial(NetherChestBlockEntity netherChestBlockEntity, boolean xmasTextures) {
+        return xmasTextures ? Sheets.CHEST_XMAS_LOCATION : NETHER_CHEST_LOCATION;
     }
 }

@@ -7,7 +7,9 @@ import fuzs.puzzleslib.api.client.core.v1.ClientModConstructor;
 import fuzs.puzzleslib.api.client.core.v1.context.BlockEntityRenderersContext;
 import fuzs.puzzleslib.api.client.core.v1.context.LayerDefinitionsContext;
 import fuzs.puzzleslib.api.client.core.v1.context.MenuScreensContext;
+import fuzs.puzzleslib.api.client.core.v1.context.SpecialBlockModelRenderersContext;
 import net.minecraft.client.model.ChestModel;
+import net.minecraft.client.renderer.special.ChestSpecialRenderer;
 
 public class NetherChestedClient implements ClientModConstructor {
 
@@ -26,5 +28,11 @@ public class NetherChestedClient implements ClientModConstructor {
     public void onRegisterLayerDefinitions(LayerDefinitionsContext context) {
         context.registerLayerDefinition(NetherChestRenderer.NETHER_CHEST_MODEL_LAYER_LOCATION,
                 ChestModel::createSingleBodyLayer);
+    }
+
+    @Override
+    public void onRegisterSpecialBlockModelRenderers(SpecialBlockModelRenderersContext context) {
+        context.registerSpecialBlockModelRenderer(ModRegistry.NETHER_CHEST_BLOCK.value(),
+                new ChestSpecialRenderer.Unbaked(NetherChestRenderer.NETHER_CHEST_TEXTURE));
     }
 }
