@@ -16,7 +16,7 @@ public class NetherChestRenderer extends SingleChestRenderer<NetherChestBlockEnt
     public static final ModelLayerLocation NETHER_CHEST_MODEL_LAYER_LOCATION = MODEL_LAYERS.registerModelLayer(
             "nether_chest");
     public static final ResourceLocation NETHER_CHEST_TEXTURE = NetherChested.id("nether");
-    private static final Material NETHER_CHEST_LOCATION = Sheets.chestMaterial(NETHER_CHEST_TEXTURE);
+    private static final Material NETHER_CHEST_LOCATION = Sheets.CHEST_MAPPER.apply(NETHER_CHEST_TEXTURE);
 
     public NetherChestRenderer(BlockEntityRendererProvider.Context context) {
         super(context, new ChestModel(context.bakeLayer(NETHER_CHEST_MODEL_LAYER_LOCATION)));

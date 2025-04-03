@@ -28,8 +28,8 @@ import net.minecraft.world.level.block.entity.LidBlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 
 /**
- * Mostly a reimplementation of vanilla's {@link net.minecraft.world.level.block.entity.ChestBlockEntity}, which does not implement
- * {@link net.minecraft.world.Container} to be able to handle item transfers ourselves on Fabric.
+ * Mostly a reimplementation of vanilla's {@link net.minecraft.world.level.block.entity.ChestBlockEntity}, which does
+ * not implement {@link net.minecraft.world.Container} to be able to handle item transfers ourselves on Fabric.
  */
 public class NetherChestBlockEntity extends NamedBlockEntity implements LidBlockEntity, TickingBlockEntity {
     public static final MutableComponent CONTAINER_TITLE = Component.translatable("container.nether_chest");
@@ -76,6 +76,13 @@ public class NetherChestBlockEntity extends NamedBlockEntity implements LidBlock
     protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         super.saveAdditional(tag, registries);
         LimitlessContainerUtils.saveAllItems(tag, this.items, true, registries);
+    }
+
+    @Override
+    public void preRemoveSideEffects(BlockPos blockPos, BlockState blockState) {
+        if (this.level != null) {
+            LimitlessContainerUtils.dropContents(this.level, blockPos, this.container);
+        }
     }
 
     @Override
@@ -126,8 +133,7 @@ public class NetherChestBlockEntity extends NamedBlockEntity implements LidBlock
                 NetherChestBlockEntity.this.openersCounter.incrementOpeners(player,
                         NetherChestBlockEntity.this.getLevel(),
                         NetherChestBlockEntity.this.getBlockPos(),
-                        NetherChestBlockEntity.this.getBlockState()
-                );
+                        NetherChestBlockEntity.this.getBlockState());
             }
         }
 
@@ -137,8 +143,7 @@ public class NetherChestBlockEntity extends NamedBlockEntity implements LidBlock
                 NetherChestBlockEntity.this.openersCounter.decrementOpeners(player,
                         NetherChestBlockEntity.this.getLevel(),
                         NetherChestBlockEntity.this.getBlockPos(),
-                        NetherChestBlockEntity.this.getBlockState()
-                );
+                        NetherChestBlockEntity.this.getBlockState());
             }
         }
 
@@ -159,8 +164,7 @@ public class NetherChestBlockEntity extends NamedBlockEntity implements LidBlock
                     SoundEvents.ENDER_CHEST_OPEN,
                     SoundSource.BLOCKS,
                     0.5F,
-                    level.random.nextFloat() * 0.1F + 0.9F
-            );
+                    level.random.nextFloat() * 0.1F + 0.9F);
         }
 
         @Override
@@ -172,8 +176,7 @@ public class NetherChestBlockEntity extends NamedBlockEntity implements LidBlock
                     SoundEvents.ENDER_CHEST_CLOSE,
                     SoundSource.BLOCKS,
                     0.5F,
-                    level.random.nextFloat() * 0.1F + 0.9F
-            );
+                    level.random.nextFloat() * 0.1F + 0.9F);
         }
 
         @Override

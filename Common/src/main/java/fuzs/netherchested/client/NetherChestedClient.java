@@ -3,15 +3,22 @@ package fuzs.netherchested.client;
 import fuzs.netherchested.client.gui.screens.inventory.NetherChestScreen;
 import fuzs.netherchested.client.renderer.blockentity.NetherChestRenderer;
 import fuzs.netherchested.init.ModRegistry;
+import fuzs.netherchested.world.level.block.NetherChestBlock;
 import fuzs.puzzleslib.api.client.core.v1.ClientModConstructor;
 import fuzs.puzzleslib.api.client.core.v1.context.BlockEntityRenderersContext;
 import fuzs.puzzleslib.api.client.core.v1.context.LayerDefinitionsContext;
 import fuzs.puzzleslib.api.client.core.v1.context.MenuScreensContext;
 import fuzs.puzzleslib.api.client.core.v1.context.SpecialBlockModelRenderersContext;
+import fuzs.puzzleslib.api.client.gui.v2.tooltip.ItemTooltipRegistry;
 import net.minecraft.client.model.ChestModel;
 import net.minecraft.client.renderer.special.ChestSpecialRenderer;
 
 public class NetherChestedClient implements ClientModConstructor {
+
+    @Override
+    public void onClientSetup() {
+        ItemTooltipRegistry.registerItemTooltip(NetherChestBlock.class, NetherChestBlock::getDescriptionComponent);
+    }
 
     @Override
     public void onRegisterBlockEntityRenderers(BlockEntityRenderersContext context) {

@@ -3,11 +3,13 @@ package fuzs.netherchested.world.level.block.entity;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.NonNullList;
+import net.minecraft.core.component.DataComponentGetter;
 import net.minecraft.core.component.DataComponentMap;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtOps;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.Component.Serializer;
+import net.minecraft.network.chat.ComponentSerialization;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.LockCode;
@@ -25,8 +27,8 @@ import org.jetbrains.annotations.Nullable;
 
 /**
  * A copy of vanilla's {@link net.minecraft.world.level.block.entity.BaseContainerBlockEntity}, which does not implement
- * {@link net.minecraft.world.Container} to be able to handle item transfers ourselves on Fabric
- * (Fabric Api always gives vanilla logic precedence when the block entity also is a container).
+ * {@link net.minecraft.world.Container} to be able to handle item transfers ourselves on Fabric (Fabric Api always
+ * gives vanilla logic precedence when the block entity also is a container).
  */
 public abstract class NamedBlockEntity extends BlockEntity implements MenuProvider, Nameable {
     private LockCode lockKey;
@@ -41,9 +43,7 @@ public abstract class NamedBlockEntity extends BlockEntity implements MenuProvid
     public void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         super.loadAdditional(tag, registries);
         this.lockKey = LockCode.fromTag(tag, registries);
-        if (tag.contains("CustomName", 8)) {
-            this.name = parseCustomNameSafe(tag.getString("CustomName"), registries);
-        }
+        this.name = parseCustomNameSafe(tag.get("CustomName"), registries);
     }
 
     @Override
@@ -51,7 +51,9 @@ public abstract class NamedBlockEntity extends BlockEntity implements MenuProvid
         super.saveAdditional(tag, registries);
         this.lockKey.addToTag(tag, registries);
         if (this.name != null) {
-            tag.putString("CustomName", Serializer.toJson(this.name, registries));
+            tag.put("CustomName",
+                    ComponentSerialization.CODEC.encodeStart(registries.createSerializationContext(NbtOps.INSTANCE),
+                            this.name).getOrThrow());
         }
     }
 
@@ -102,12 +104,14 @@ public abstract class NamedBlockEntity extends BlockEntity implements MenuProvid
     }
 
     protected abstract AbstractContainerMenu createMenu(int containerId, Inventory inventory);
+
     @Override
-    protected void applyImplicitComponents(BlockEntity.DataComponentInput componentInput) {
-        super.applyImplicitComponents(componentInput);
-        this.name = componentInput.get(DataComponents.CUSTOM_NAME);
-        this.lockKey = componentInput.getOrDefault(DataComponents.LOCK, LockCode.NO_LOCK);
-        componentInput.getOrDefault(DataComponents.CONTAINER, ItemContainerContents.EMPTY).copyInto(this.getItems());
+    protected void applyImplicitComponents(DataComponentGetter dataComponentGetter) {
+        super.applyImplicitComponents(dataComponentGetter);
+        this.name = dataComponentGetter.get(DataComponents.CUSTOM_NAME);
+        this.lockKey = dataComponentGetter.getOrDefault(DataComponents.LOCK, LockCode.NO_LOCK);
+        dataComponentGetter.getOrDefault(DataComponents.CONTAINER, ItemContainerContents.EMPTY)
+                .copyInto(this.getItems());
     }
 
     @Override

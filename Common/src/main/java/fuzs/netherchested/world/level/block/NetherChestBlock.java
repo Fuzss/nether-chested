@@ -1,29 +1,24 @@
 package fuzs.netherchested.world.level.block;
 
 import com.mojang.serialization.MapCodec;
-import fuzs.limitlesscontainers.api.limitlesscontainers.v1.LimitlessContainerSynchronizer;
 import fuzs.limitlesscontainers.api.limitlesscontainers.v1.LimitlessContainerUtils;
 import fuzs.netherchested.NetherChested;
 import fuzs.netherchested.config.ServerConfig;
 import fuzs.netherchested.init.ModRegistry;
 import fuzs.netherchested.world.level.block.entity.NetherChestBlockEntity;
 import fuzs.puzzleslib.api.block.v1.entity.TickingEntityBlock;
-import fuzs.puzzleslib.api.core.v1.Proxy;
 import fuzs.puzzleslib.api.util.v1.InteractionResultHelper;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.RandomSource;
+import net.minecraft.world.Containers;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.monster.piglin.PiglinAi;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.Item;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.EnderChestBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -32,8 +27,6 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import org.jetbrains.annotations.Nullable;
-
-import java.util.List;
 
 public class NetherChestBlock extends EnderChestBlock implements TickingEntityBlock<NetherChestBlockEntity> {
     public static final MapCodec<EnderChestBlock> CODEC = simpleCodec(NetherChestBlock::new);
@@ -47,25 +40,13 @@ public class NetherChestBlock extends EnderChestBlock implements TickingEntityBl
         return CODEC;
     }
 
-    @Override
-    public void appendHoverText(ItemStack stack, Item.TooltipContext context, List<Component> tooltipComponents, TooltipFlag tooltipFlag) {
-        tooltipComponents.addAll(Proxy.INSTANCE.splitTooltipLines(this.getDescriptionComponent()));
-    }
-
     public Component getDescriptionComponent() {
         return Component.translatable(this.getDescriptionId() + ".description").withStyle(ChatFormatting.GOLD);
     }
 
     @Override
-    public void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean isMoving) {
-        if (!state.is(newState.getBlock())) {
-            if (level.getBlockEntity(pos) instanceof NetherChestBlockEntity blockEntity) {
-                LimitlessContainerUtils.dropContents(level, pos, blockEntity.getContainer());
-                level.updateNeighbourForOutputSignal(pos, this);
-            }
-
-            super.onRemove(state, level, pos, newState, isMoving);
-        }
+    protected void affectNeighborsAfterRemoval(BlockState blockState, ServerLevel serverLevel, BlockPos blockPos, boolean movedByPiston) {
+        Containers.updateNeighboursAfterDestroy(blockState, serverLevel, blockPos);
     }
 
     @Override
@@ -89,22 +70,22 @@ public class NetherChestBlock extends EnderChestBlock implements TickingEntityBl
         } else if (level.isClientSide) {
             return InteractionResult.SUCCESS;
         } else {
-            if (level.dimension() == Level.NETHER && NetherChested.CONFIG.get(
-                    ServerConfig.class).netherExplosionStrength > 0) {
+            if (level.dimension() == Level.NETHER &&
+                    NetherChested.CONFIG.get(ServerConfig.class).netherExplosionStrength > 0) {
                 level.removeBlock(pos, false);
-                level.explode(null, level.damageSources().badRespawnPointExplosion(pos.getCenter()), null,
-                        pos.getCenter(), NetherChested.CONFIG.get(ServerConfig.class).netherExplosionStrength, true,
-                        Level.ExplosionInteraction.BLOCK
-                );
+                level.explode(null,
+                        level.damageSources().badRespawnPointExplosion(pos.getCenter()),
+                        null,
+                        pos.getCenter(),
+                        NetherChested.CONFIG.get(ServerConfig.class).netherExplosionStrength,
+                        true,
+                        Level.ExplosionInteraction.BLOCK);
             } else {
                 MenuProvider menuProvider = this.getMenuProvider(state, level, pos);
                 if (menuProvider != null) {
-                    LimitlessContainerSynchronizer.setSynchronizerFor((ServerPlayer) player,
-                            player.openMenu(menuProvider).orElse(-1)
-                    );
+                    player.openMenu(menuProvider);
                     PiglinAi.angerNearbyPiglins((ServerLevel) level, player, true);
                 }
-
             }
 
             return InteractionResult.CONSUME;
