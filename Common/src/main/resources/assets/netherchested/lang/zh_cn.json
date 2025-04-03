@@ -1,0 +1,5 @@
+{
+  "block.netherchested.nether_chest": "下界箱子",
+  "block.netherchested.nether_chest.description": "可以在单个槽中存储海量物品。",
+  "container.nether_chest": "下界箱子"
+}
