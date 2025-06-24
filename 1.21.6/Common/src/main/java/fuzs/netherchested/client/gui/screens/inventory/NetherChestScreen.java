@@ -1,11 +1,10 @@
 package fuzs.netherchested.client.gui.screens.inventory;
 
-import com.mojang.blaze3d.systems.RenderSystem;
 import fuzs.limitlesscontainers.api.limitlesscontainers.v1.client.LimitlessContainerScreen;
 import fuzs.netherchested.NetherChested;
 import fuzs.netherchested.world.inventory.NetherChestMenu;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
@@ -40,8 +39,7 @@ public class NetherChestScreen extends LimitlessContainerScreen<NetherChestMenu>
 
     @Override
     protected void renderBg(GuiGraphics guiGraphics, float partialTick, int mouseX, int mouseY) {
-        RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
-        guiGraphics.blit(RenderType::guiTextured,
+        guiGraphics.blit(RenderPipelines.GUI_TEXTURED,
                 CONTAINER_BACKGROUND,
                 this.leftPos,
                 this.topPos,

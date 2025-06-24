@@ -17,7 +17,8 @@ public class NetherChestedClient implements ClientModConstructor {
 
     @Override
     public void onClientSetup() {
-        ItemTooltipRegistry.registerItemTooltip(NetherChestBlock.class, NetherChestBlock::getDescriptionComponent);
+        ItemTooltipRegistry.BLOCK.registerItemTooltip(NetherChestBlock.class,
+                NetherChestBlock::getDescriptionComponent);
     }
 
     @Override

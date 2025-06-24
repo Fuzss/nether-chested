@@ -27,7 +27,7 @@ public class ModRegistry {
             () -> Collections.singleton(NETHER_CHEST_BLOCK.value()));
     public static final Holder.Reference<MenuType<NetherChestMenu>> NETHER_CHEST_MENU_TYPE = REGISTRIES.registerMenuType(
             "nether_chest",
-            () -> NetherChestMenu::new);
+            NetherChestMenu::new);
 
     public static void bootstrap() {
         // NO-OP

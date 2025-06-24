@@ -10,9 +10,7 @@ import fuzs.puzzleslib.api.block.v1.entity.TickingBlockEntity;
 import fuzs.puzzleslib.api.container.v1.ContainerMenuHelper;
 import fuzs.puzzleslib.api.container.v1.ListBackedContainer;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.HolderLookup;
 import net.minecraft.core.NonNullList;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.sounds.SoundEvents;
@@ -26,6 +24,8 @@ import net.minecraft.world.level.block.entity.ChestLidController;
 import net.minecraft.world.level.block.entity.ContainerOpenersCounter;
 import net.minecraft.world.level.block.entity.LidBlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 
 /**
  * Mostly a reimplementation of vanilla's {@link net.minecraft.world.level.block.entity.ChestBlockEntity}, which does
@@ -65,17 +65,17 @@ public class NetherChestBlockEntity extends NamedBlockEntity implements LidBlock
     }
 
     @Override
-    public void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
-        super.loadAdditional(tag, registries);
+    public void loadAdditional(ValueInput valueInput) {
+        super.loadAdditional(valueInput);
         this.items.clear();
-        LimitlessContainerUtils.loadAllItems(tag, this.items, registries);
+        LimitlessContainerUtils.loadAllItems(valueInput, this.items);
 
     }
 
     @Override
-    protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
-        super.saveAdditional(tag, registries);
-        LimitlessContainerUtils.saveAllItems(tag, this.items, true, registries);
+    protected void saveAdditional(ValueOutput valueOutput) {
+        super.saveAdditional(valueOutput);
+        LimitlessContainerUtils.saveAllItems(valueOutput, this.items);
     }
 
     @Override
@@ -186,8 +186,8 @@ public class NetherChestBlockEntity extends NamedBlockEntity implements LidBlock
 
         @Override
         protected boolean isOwnContainer(Player player) {
-            return player.containerMenu instanceof NetherChestMenu netherChestMenu &&
-                    netherChestMenu.is(NetherChestBlockEntity.this.container);
+            return player.containerMenu instanceof NetherChestMenu netherChestMenu && netherChestMenu.is(
+                    NetherChestBlockEntity.this.container);
         }
     }
 }
