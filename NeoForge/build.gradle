@@ -7,9 +7,3 @@ dependencies {
     // Limitless Containers
     modApi(include(libs.limitlesscontainers.neoforge.get()))
 }
-
-tasks.withType(net.fabricmc.loom.task.AbstractRunTask).configureEach {
-    doFirst {
-        patchLaunchCfg()
-    }
-}
