@@ -10,6 +10,7 @@ import fuzs.puzzleslib.api.block.v1.entity.TickingEntityBlock;
 import fuzs.puzzleslib.api.util.v1.InteractionResultHelper;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
@@ -55,8 +56,8 @@ public class NetherChestBlock extends EnderChestBlock implements TickingEntityBl
     }
 
     @Override
-    public int getAnalogOutputSignal(BlockState state, Level level, BlockPos pos) {
-        if (level.getBlockEntity(pos) instanceof NetherChestBlockEntity blockEntity) {
+    protected int getAnalogOutputSignal(BlockState blockState, Level level, BlockPos blockPos, Direction direction) {
+        if (level.getBlockEntity(blockPos) instanceof NetherChestBlockEntity blockEntity) {
             return LimitlessContainerUtils.getRedstoneSignalFromContainer(blockEntity.getContainer());
         } else {
             return 0;
@@ -66,12 +67,12 @@ public class NetherChestBlock extends EnderChestBlock implements TickingEntityBl
     @Override
     protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hitResult) {
         if (level.getBlockState(pos.above()).isRedstoneConductor(level, pos.above())) {
-            return InteractionResultHelper.sidedSuccess(level.isClientSide);
-        } else if (level.isClientSide) {
+            return InteractionResultHelper.sidedSuccess(level.isClientSide());
+        } else if (level.isClientSide()) {
             return InteractionResult.SUCCESS;
         } else {
-            if (level.dimension() == Level.NETHER &&
-                    NetherChested.CONFIG.get(ServerConfig.class).netherExplosionStrength > 0) {
+            if (level.dimension() == Level.NETHER
+                    && NetherChested.CONFIG.get(ServerConfig.class).netherExplosionStrength > 0) {
                 level.removeBlock(pos, false);
                 level.explode(null,
                         level.damageSources().badRespawnPointExplosion(pos.getCenter()),

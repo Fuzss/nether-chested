@@ -15,6 +15,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.entity.ContainerUser;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
@@ -127,19 +128,20 @@ public class NetherChestBlockEntity extends NamedBlockEntity implements LidBlock
         }
 
         @Override
-        public void startOpen(Player player) {
-            if (!NetherChestBlockEntity.this.remove && !player.isSpectator()) {
-                NetherChestBlockEntity.this.openersCounter.incrementOpeners(player,
+        public void startOpen(ContainerUser containerUser) {
+            if (!NetherChestBlockEntity.this.remove && !containerUser.getLivingEntity().isSpectator()) {
+                NetherChestBlockEntity.this.openersCounter.incrementOpeners(containerUser.getLivingEntity(),
                         NetherChestBlockEntity.this.getLevel(),
                         NetherChestBlockEntity.this.getBlockPos(),
-                        NetherChestBlockEntity.this.getBlockState());
+                        NetherChestBlockEntity.this.getBlockState(),
+                        containerUser.getContainerInteractionRange());
             }
         }
 
         @Override
-        public void stopOpen(Player player) {
-            if (!NetherChestBlockEntity.this.remove && !player.isSpectator()) {
-                NetherChestBlockEntity.this.openersCounter.decrementOpeners(player,
+        public void stopOpen(ContainerUser containerUser) {
+            if (!NetherChestBlockEntity.this.remove && !containerUser.getLivingEntity().isSpectator()) {
+                NetherChestBlockEntity.this.openersCounter.decrementOpeners(containerUser.getLivingEntity(),
                         NetherChestBlockEntity.this.getLevel(),
                         NetherChestBlockEntity.this.getBlockPos(),
                         NetherChestBlockEntity.this.getBlockState());
@@ -184,7 +186,7 @@ public class NetherChestBlockEntity extends NamedBlockEntity implements LidBlock
         }
 
         @Override
-        protected boolean isOwnContainer(Player player) {
+        public boolean isOwnContainer(Player player) {
             return player.containerMenu instanceof NetherChestMenu netherChestMenu && netherChestMenu.is(
                     NetherChestBlockEntity.this.container);
         }

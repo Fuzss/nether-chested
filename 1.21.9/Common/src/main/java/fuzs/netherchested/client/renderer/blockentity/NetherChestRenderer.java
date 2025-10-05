@@ -11,7 +11,7 @@ import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.resources.model.Material;
 import net.minecraft.resources.ResourceLocation;
 
-public class NetherChestRenderer extends SingleChestRenderer<NetherChestBlockEntity, ChestModel> {
+public class NetherChestRenderer extends SingleChestRenderer<NetherChestBlockEntity, ChestModel, SingleChestRenderer.SingleChestRenderState> {
     static final ModelLayerFactory MODEL_LAYERS = ModelLayerFactory.from(NetherChested.MOD_ID);
     public static final ModelLayerLocation NETHER_CHEST_MODEL_LAYER_LOCATION = MODEL_LAYERS.registerModelLayer(
             "nether_chest");
