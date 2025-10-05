@@ -69,7 +69,6 @@ public class NetherChestBlockEntity extends NamedBlockEntity implements LidBlock
         super.loadAdditional(valueInput);
         this.items.clear();
         LimitlessContainerUtils.loadAllItems(valueInput, this.items);
-
     }
 
     @Override
