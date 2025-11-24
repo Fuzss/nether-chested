@@ -1,5 +1,7 @@
 package fuzs.netherchested.world.level.block.entity;
 
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 import fuzs.limitlesscontainers.api.limitlesscontainers.v1.LimitlessContainerUtils;
 import fuzs.limitlesscontainers.api.limitlesscontainers.v1.MultipliedContainer;
 import fuzs.netherchested.NetherChested;
@@ -11,6 +13,9 @@ import fuzs.puzzleslib.api.container.v1.ContainerMenuHelper;
 import fuzs.puzzleslib.api.container.v1.ListBackedContainer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.NonNullList;
+import net.minecraft.core.component.DataComponentGetter;
+import net.minecraft.core.component.DataComponentMap;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.sounds.SoundEvents;
@@ -20,6 +25,7 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.component.ItemContainerContents;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.ChestLidController;
 import net.minecraft.world.level.block.entity.ContainerOpenersCounter;
@@ -33,6 +39,21 @@ import net.minecraft.world.level.storage.ValueOutput;
  * not implement {@link net.minecraft.world.Container} to be able to handle item transfers ourselves on Fabric.
  */
 public class NetherChestBlockEntity extends NamedBlockEntity implements LidBlockEntity, TickingBlockEntity {
+    /**
+     * @see ItemContainerContents.Slot#CODEC
+     */
+    public static final Codec<ItemContainerContents.Slot> ITEM_CONTAINER_CONTENTS_SLOT_CODEC = RecordCodecBuilder.create(
+            instance -> instance.group(Codec.intRange(0, 255)
+                                    .fieldOf("slot")
+                                    .forGetter(ItemContainerContents.Slot::index),
+                            LimitlessContainerUtils.ITEM_STACK_CODEC.fieldOf("item")
+                                    .forGetter(ItemContainerContents.Slot::item))
+                    .apply(instance, ItemContainerContents.Slot::new));
+    /**
+     * @see ItemContainerContents#CODEC
+     */
+    public static final Codec<ItemContainerContents> ITEM_CONTAINER_CONTENTS_CODEC = ITEM_CONTAINER_CONTENTS_SLOT_CODEC.sizeLimitedListOf(
+            256).xmap(ItemContainerContents::fromSlots, ItemContainerContents::asSlots);
     public static final MutableComponent CONTAINER_TITLE = Component.translatable("container.nether_chest");
     public static final int CONTAINER_SIZE = 54;
 
@@ -68,14 +89,14 @@ public class NetherChestBlockEntity extends NamedBlockEntity implements LidBlock
     @Override
     public void loadAdditional(ValueInput valueInput) {
         super.loadAdditional(valueInput);
-        this.items.clear();
-        LimitlessContainerUtils.loadAllItems(valueInput, this.items);
+        this.getItems().clear();
+        LimitlessContainerUtils.loadAllItems(valueInput, this.getItems());
     }
 
     @Override
     protected void saveAdditional(ValueOutput valueOutput) {
         super.saveAdditional(valueOutput);
-        LimitlessContainerUtils.saveAllItems(valueOutput, this.items);
+        LimitlessContainerUtils.saveAllItems(valueOutput, this.getItems());
     }
 
     @Override
@@ -83,6 +104,22 @@ public class NetherChestBlockEntity extends NamedBlockEntity implements LidBlock
         if (this.level != null) {
             LimitlessContainerUtils.dropContents(this.level, blockPos, this.container);
         }
+    }
+
+    @Override
+    protected void applyImplicitComponents(DataComponentGetter componentGetter) {
+        super.applyImplicitComponents(componentGetter);
+        this.getItems().clear();
+        componentGetter.getOrDefault(ModRegistry.UNLIMITED_CONTAINER_DATA_COMPONENT_TYPE.value(),
+                ItemContainerContents.EMPTY).copyInto(this.getItems());
+    }
+
+    @Override
+    protected void collectImplicitComponents(DataComponentMap.Builder components) {
+        super.collectImplicitComponents(components);
+        components.set(DataComponents.CONTAINER, null);
+        components.set(ModRegistry.UNLIMITED_CONTAINER_DATA_COMPONENT_TYPE.value(),
+                ItemContainerContents.fromItems(this.getItems()));
     }
 
     @Override
@@ -97,7 +134,7 @@ public class NetherChestBlockEntity extends NamedBlockEntity implements LidBlock
 
     @Override
     protected void setItems(NonNullList<ItemStack> items) {
-        ContainerMenuHelper.copyItemsIntoList(items, this.items);
+        ContainerMenuHelper.copyItemsIntoList(items, this.getItems());
     }
 
     @Override
@@ -119,7 +156,7 @@ public class NetherChestBlockEntity extends NamedBlockEntity implements LidBlock
 
         @Override
         public NonNullList<ItemStack> getContainerItems() {
-            return NetherChestBlockEntity.this.items;
+            return NetherChestBlockEntity.this.getItems();
         }
 
         @Override
