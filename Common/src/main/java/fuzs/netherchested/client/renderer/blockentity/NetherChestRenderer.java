@@ -4,18 +4,18 @@ import fuzs.netherchested.NetherChested;
 import fuzs.netherchested.world.level.block.entity.NetherChestBlockEntity;
 import fuzs.puzzleslib.api.client.init.v1.ModelLayerFactory;
 import fuzs.puzzleslib.api.client.renderer.v1.SingleChestRenderer;
-import net.minecraft.client.model.ChestModel;
 import net.minecraft.client.model.geom.ModelLayerLocation;
+import net.minecraft.client.model.object.chest.ChestModel;
 import net.minecraft.client.renderer.Sheets;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.resources.model.Material;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 public class NetherChestRenderer extends SingleChestRenderer<NetherChestBlockEntity, ChestModel, SingleChestRenderer.SingleChestRenderState> {
     static final ModelLayerFactory MODEL_LAYERS = ModelLayerFactory.from(NetherChested.MOD_ID);
     public static final ModelLayerLocation NETHER_CHEST_MODEL_LAYER_LOCATION = MODEL_LAYERS.registerModelLayer(
             "nether_chest");
-    public static final ResourceLocation NETHER_CHEST_TEXTURE = NetherChested.id("nether");
+    public static final Identifier NETHER_CHEST_TEXTURE = NetherChested.id("nether");
     private static final Material NETHER_CHEST_LOCATION = Sheets.CHEST_MAPPER.apply(NETHER_CHEST_TEXTURE);
 
     public NetherChestRenderer(BlockEntityRendererProvider.Context context) {

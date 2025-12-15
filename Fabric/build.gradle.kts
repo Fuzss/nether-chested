@@ -5,4 +5,6 @@ plugins {
 dependencies {
     modApi(libs.fabricapi.fabric)
     modApi(libs.puzzleslib.fabric)
+    modApi(libs.limitlesscontainers.fabric)
+    include(libs.limitlesscontainers.fabric)
 }

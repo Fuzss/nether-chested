@@ -6,11 +6,11 @@ import fuzs.netherchested.world.inventory.NetherChestMenu;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.player.Inventory;
 
 public class NetherChestScreen extends LimitlessContainerScreen<NetherChestMenu> {
-    public static final ResourceLocation CONTAINER_BACKGROUND = NetherChested.id(
+    public static final Identifier CONTAINER_BACKGROUND = NetherChested.id(
             "textures/gui/container/nether_chest.png");
 
     public NetherChestScreen(NetherChestMenu chestMenu, Inventory inventory, Component component) {

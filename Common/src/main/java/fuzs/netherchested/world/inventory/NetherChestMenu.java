@@ -8,7 +8,6 @@ import fuzs.netherchested.NetherChested;
 import fuzs.netherchested.config.ServerConfig;
 import fuzs.netherchested.init.ModRegistry;
 import fuzs.netherchested.world.level.block.entity.NetherChestBlockEntity;
-import fuzs.puzzleslib.api.container.v1.ContainerMenuHelper;
 import net.minecraft.world.Container;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
@@ -20,11 +19,10 @@ public class NetherChestMenu extends LimitlessContainerMenu {
     private final MultipliedContainer container;
 
     public NetherChestMenu(int containerId, Inventory inventory) {
-        this(containerId, inventory,
+        this(containerId,
+                inventory,
                 new MultipliedSimpleContainer(NetherChested.CONFIG.get(ServerConfig.class).stackSizeMultiplier,
-                        NetherChestBlockEntity.CONTAINER_SIZE
-                )
-        );
+                        NetherChestBlockEntity.CONTAINER_SIZE));
     }
 
     public NetherChestMenu(int containerId, Inventory inventory, MultipliedContainer container) {
@@ -33,7 +31,7 @@ public class NetherChestMenu extends LimitlessContainerMenu {
         this.container = container;
         container.startOpen(inventory.player);
         this.addContainerSlots();
-        ContainerMenuHelper.addInventorySlots(this, inventory, 103 + 6 + (this.containerRows - 4) * 18);
+        this.addStandardInventorySlots(inventory, 8, 103 + 6 + (this.containerRows - 4) * 18);
     }
 
     private void addContainerSlots() {

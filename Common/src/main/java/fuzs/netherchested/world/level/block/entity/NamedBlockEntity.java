@@ -7,8 +7,6 @@ import net.minecraft.core.component.DataComponentMap;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.ComponentSerialization;
-import net.minecraft.sounds.SoundEvents;
-import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.LockCode;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.Nameable;
@@ -17,12 +15,13 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.component.ItemContainerContents;
+import net.minecraft.world.level.block.entity.BaseContainerBlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 /**
  * A copy of vanilla's {@link net.minecraft.world.level.block.entity.BaseContainerBlockEntity}, which does not implement
@@ -71,27 +70,23 @@ public abstract class NamedBlockEntity extends BlockEntity implements MenuProvid
     protected abstract Component getDefaultName();
 
     public boolean canOpen(Player player) {
-        return canUnlock(player, this.lockKey, this.getDisplayName());
-    }
-
-    public static boolean canUnlock(Player player, LockCode code, Component displayName) {
-        if (!player.isSpectator() && !code.unlocksWith(player.getMainHandItem())) {
-            player.displayClientMessage(Component.translatable("container.isLocked", displayName), true);
-            player.playNotifySound(SoundEvents.CHEST_LOCKED, SoundSource.BLOCKS, 1.0F, 1.0F);
-            return false;
-        } else {
-            return true;
-        }
+        return this.lockKey.canUnlock(player);
     }
 
     protected abstract NonNullList<ItemStack> getItems();
 
     protected abstract void setItems(NonNullList<ItemStack> items);
 
-    @Nullable
     @Override
-    public AbstractContainerMenu createMenu(int i, Inventory inventory, Player player) {
-        return this.canOpen(player) ? this.createMenu(i, inventory) : null;
+    public @Nullable AbstractContainerMenu createMenu(int i, Inventory inventory, Player player) {
+        if (this.canOpen(player)) {
+            return this.createMenu(i, inventory);
+        } else {
+            BaseContainerBlockEntity.sendChestLockedNotifications(this.getBlockPos().getCenter(),
+                    player,
+                    this.getDisplayName());
+            return null;
+        }
     }
 
     protected abstract AbstractContainerMenu createMenu(int containerId, Inventory inventory);

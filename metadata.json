@@ -1,0 +1,69 @@
+{
+    "mod": {
+        "id": "netherchested",
+        "group": "fuzs.netherchested",
+        "name": "Nether Chested",
+        "version": "21.11.0",
+        "authors": [
+            "Fuzs"
+        ],
+        "description": "Use the Nether's power to store 8 times more items than usual in this chest.",
+        "license": "MPL-2.0"
+    },
+    "dependencies": [
+        {
+            "name": "limitlesscontainers",
+            "type": "embedded",
+            "platforms": [
+                "fabric",
+                "neoforge"
+            ]
+        },
+        {
+            "name": "fabricapi",
+            "type": "required",
+            "platforms": [
+                "fabric"
+            ]
+        },
+        {
+            "name": "forgeconfigapiport",
+            "type": "required",
+            "platforms": [
+                "fabric"
+            ]
+        },
+        {
+            "name": "puzzleslib",
+            "type": "required",
+            "platforms": [
+                "fabric",
+                "neoforge"
+            ]
+        }
+    ],
+    "links": [
+        {
+            "name": "github",
+            "slug": "netherchested"
+        },
+        {
+            "name": "curseforge",
+            "slug": "nether-chested",
+            "id": "857971"
+        },
+        {
+            "name": "modrinth",
+            "slug": "nether-chested",
+            "id": "bHJp2GRg"
+        }
+    ],
+    "environments": {
+        "client": "required",
+        "server": "required"
+    },
+    "platforms": [
+        "fabric",
+        "neoforge"
+    ]
+}

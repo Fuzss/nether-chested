@@ -10,7 +10,7 @@ import fuzs.puzzleslib.api.client.core.v1.context.LayerDefinitionsContext;
 import fuzs.puzzleslib.api.client.core.v1.context.MenuScreensContext;
 import fuzs.puzzleslib.api.client.core.v1.context.SpecialBlockModelRenderersContext;
 import fuzs.puzzleslib.api.client.gui.v2.tooltip.ItemTooltipRegistry;
-import net.minecraft.client.model.ChestModel;
+import net.minecraft.client.model.object.chest.ChestModel;
 import net.minecraft.client.renderer.special.ChestSpecialRenderer;
 
 public class NetherChestedClient implements ClientModConstructor {
