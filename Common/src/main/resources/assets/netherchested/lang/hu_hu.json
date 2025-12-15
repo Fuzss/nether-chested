@@ -1,0 +1,5 @@
+{
+  "block.netherchested.nether_chest": "Nether Láda",
+  "block.netherchested.nether_chest.description": "Lehetővé teszi, hogy egyetlen helyen sokkal több itemet tárolj, mint bármely más tárolóban.",
+  "container.nether_chest": "Nether Láda"
+}

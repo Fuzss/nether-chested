@@ -1,0 +1,7 @@
+{
+  "variants": {
+    "": {
+      "model": "netherchested:block/nether_chest"
+    }
+  }
+}
