@@ -1,0 +1,5 @@
+{
+  "block.netherchested.nether_chest": "Nether Sandığı",
+  "block.netherchested.nether_chest.description": "Tek bir yuvaya diğer sandıklardan çok daha fazla eşyayı sığdırmayı olağan kılar",
+  "container.nether_chest": "Nether Sandığı"
+}
