@@ -1,0 +1,5 @@
+{
+  "block.netherchested.nether_chest": "Nether-Truhe",
+  "block.netherchested.nether_chest.description": "Ermöglicht das Speichern von viel mehr Gegenständen in einem einzelnen Slot als jedes andere Inventar.",
+  "container.nether_chest": "Nether-Truhe"
+}

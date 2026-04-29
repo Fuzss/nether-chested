@@ -1,0 +1,5 @@
+{
+  "block.netherchested.nether_chest": "Coffre du Nether",
+  "block.netherchested.nether_chest.description": "Permet de stocker beaucoup plus d'objets dans un seul emplacement que n'importe quel autre inventaire.",
+  "container.nether_chest": "Coffre du Nether"
+}
