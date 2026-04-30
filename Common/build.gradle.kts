@@ -3,6 +3,6 @@ plugins {
 }
 
 dependencies {
-    modCompileOnlyApi(libs.puzzleslib.common)
-    modCompileOnlyApi(libs.limitlesscontainers.common)
+    modCompileOnlyApi(sharedLibs.puzzleslib.common)
+    modCompileOnlyApi(sharedLibs.limitlesscontainers.common)
 }

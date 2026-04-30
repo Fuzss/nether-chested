@@ -3,9 +3,9 @@ plugins {
 }
 
 dependencies {
-    modCompileOnly(libs.puzzleslib.common)
-    modApi(libs.puzzleslib.neoforge)
-    modCompileOnly(libs.limitlesscontainers.common)
-    modApi(libs.limitlesscontainers.neoforge)
-    include(libs.limitlesscontainers.neoforge)
+    modCompileOnly(sharedLibs.puzzleslib.common)
+    modApi(sharedLibs.puzzleslib.neoforge)
+    modCompileOnly(sharedLibs.limitlesscontainers.common)
+    modApi(sharedLibs.limitlesscontainers.neoforge)
+    include(sharedLibs.limitlesscontainers.neoforge)
 }
