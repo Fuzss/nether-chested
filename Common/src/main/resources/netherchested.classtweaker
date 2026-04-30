@@ -1,5 +1,5 @@
 classTweaker    v2  official
 accessible  class   net/minecraft/world/item/component/ItemContainerContents$Slot
-accessible  method  net/minecraft/world/item/component/ItemContainerContents$Slot   <init>  (ILnet/minecraft/world/item/ItemStack;)V
+accessible  method  net/minecraft/world/item/component/ItemContainerContents$Slot   <init>  (ILnet/minecraft/world/item/ItemStackTemplate;)V
 accessible  method  net/minecraft/world/item/component/ItemContainerContents    fromSlots   (Ljava/util/List;)Lnet/minecraft/world/item/component/ItemContainerContents;
 accessible  method  net/minecraft/world/item/component/ItemContainerContents    asSlots ()Ljava/util/List;

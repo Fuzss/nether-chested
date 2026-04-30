@@ -2,13 +2,13 @@ package fuzs.netherchested.client.renderer.blockentity;
 
 import fuzs.netherchested.NetherChested;
 import fuzs.netherchested.world.level.block.entity.NetherChestBlockEntity;
-import fuzs.puzzleslib.api.client.init.v1.ModelLayerFactory;
-import fuzs.puzzleslib.api.client.renderer.v1.SingleChestRenderer;
+import fuzs.puzzleslib.common.api.client.init.v1.ModelLayerFactory;
+import fuzs.puzzleslib.common.api.client.renderer.v1.SingleChestRenderer;
 import net.minecraft.client.model.geom.ModelLayerLocation;
 import net.minecraft.client.model.object.chest.ChestModel;
 import net.minecraft.client.renderer.Sheets;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
-import net.minecraft.client.resources.model.Material;
+import net.minecraft.client.resources.model.sprite.SpriteId;
 import net.minecraft.resources.Identifier;
 
 public class NetherChestRenderer extends SingleChestRenderer<NetherChestBlockEntity, ChestModel, SingleChestRenderer.SingleChestRenderState> {
@@ -16,14 +16,14 @@ public class NetherChestRenderer extends SingleChestRenderer<NetherChestBlockEnt
     public static final ModelLayerLocation NETHER_CHEST_MODEL_LAYER_LOCATION = MODEL_LAYERS.registerModelLayer(
             "nether_chest");
     public static final Identifier NETHER_CHEST_TEXTURE = NetherChested.id("nether");
-    private static final Material NETHER_CHEST_LOCATION = Sheets.CHEST_MAPPER.apply(NETHER_CHEST_TEXTURE);
+    private static final SpriteId NETHER_CHEST_SPRITE = Sheets.CHEST_MAPPER.apply(NETHER_CHEST_TEXTURE);
 
     public NetherChestRenderer(BlockEntityRendererProvider.Context context) {
         super(context, new ChestModel(context.bakeLayer(NETHER_CHEST_MODEL_LAYER_LOCATION)));
     }
 
     @Override
-    protected Material getChestMaterial(NetherChestBlockEntity netherChestBlockEntity, boolean xmasTextures) {
-        return xmasTextures ? Sheets.CHEST_XMAS_LOCATION : NETHER_CHEST_LOCATION;
+    protected SpriteId getChestSprite(NetherChestBlockEntity blockEntity) {
+        return NETHER_CHEST_SPRITE;
     }
 }

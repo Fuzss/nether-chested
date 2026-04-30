@@ -1,9 +1,10 @@
 {
+    "minecraft": "26.1.2",
     "mod": {
         "id": "netherchested",
         "group": "fuzs.netherchested",
         "name": "Nether Chested",
-        "version": "21.11.0",
+        "version": "26.1.0",
         "authors": [
             "Fuzs"
         ],
@@ -44,13 +45,13 @@
     ],
     "links": [
         {
-            "name": "github",
-            "slug": "netherchested"
-        },
-        {
             "name": "curseforge",
             "slug": "nether-chested",
             "id": "857971"
+        },
+        {
+            "name": "github",
+            "slug": "nether-chested"
         },
         {
             "name": "modrinth",

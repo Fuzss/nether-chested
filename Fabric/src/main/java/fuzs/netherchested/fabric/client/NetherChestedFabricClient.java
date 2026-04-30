@@ -2,7 +2,7 @@ package fuzs.netherchested.fabric.client;
 
 import fuzs.netherchested.NetherChested;
 import fuzs.netherchested.client.NetherChestedClient;
-import fuzs.puzzleslib.api.client.core.v1.ClientModConstructor;
+import fuzs.puzzleslib.common.api.client.core.v1.ClientModConstructor;
 import net.fabricmc.api.ClientModInitializer;
 
 public class NetherChestedFabricClient implements ClientModInitializer {

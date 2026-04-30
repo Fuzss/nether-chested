@@ -4,7 +4,7 @@ import fuzs.limitlesscontainers.fabric.api.limitlesscontainers.v1.LimitlessSlotS
 import fuzs.netherchested.NetherChested;
 import fuzs.netherchested.init.ModRegistry;
 import fuzs.netherchested.world.level.block.entity.NetherChestBlockEntity;
-import fuzs.puzzleslib.api.core.v1.ModConstructor;
+import fuzs.puzzleslib.common.api.core.v1.ModConstructor;
 import net.fabricmc.api.ModInitializer;
 
 public class NetherChestedFabric implements ModInitializer {

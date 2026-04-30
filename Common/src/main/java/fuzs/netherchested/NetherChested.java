@@ -2,10 +2,10 @@ package fuzs.netherchested;
 
 import fuzs.netherchested.config.ServerConfig;
 import fuzs.netherchested.init.ModRegistry;
-import fuzs.puzzleslib.api.config.v3.ConfigHolder;
-import fuzs.puzzleslib.api.core.v1.ModConstructor;
+import fuzs.puzzleslib.common.api.config.v3.ConfigHolder;
+import fuzs.puzzleslib.common.api.core.v1.ModConstructor;
 import net.minecraft.resources.Identifier;
-import fuzs.puzzleslib.api.event.v1.BuildCreativeModeTabContentsCallback;
+import fuzs.puzzleslib.common.api.event.v1.BuildCreativeModeTabContentsCallback;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.CreativeModeTabs;

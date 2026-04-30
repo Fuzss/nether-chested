@@ -4,14 +4,23 @@ import fuzs.netherchested.client.gui.screens.inventory.NetherChestScreen;
 import fuzs.netherchested.client.renderer.blockentity.NetherChestRenderer;
 import fuzs.netherchested.init.ModRegistry;
 import fuzs.netherchested.world.level.block.NetherChestBlock;
-import fuzs.puzzleslib.api.client.core.v1.ClientModConstructor;
-import fuzs.puzzleslib.api.client.core.v1.context.BlockEntityRenderersContext;
-import fuzs.puzzleslib.api.client.core.v1.context.LayerDefinitionsContext;
-import fuzs.puzzleslib.api.client.core.v1.context.MenuScreensContext;
-import fuzs.puzzleslib.api.client.core.v1.context.SpecialBlockModelRenderersContext;
-import fuzs.puzzleslib.api.client.gui.v2.tooltip.ItemTooltipRegistry;
+import fuzs.puzzleslib.common.api.client.core.v1.ClientModConstructor;
+import fuzs.puzzleslib.common.api.client.core.v1.context.BlockEntityRenderersContext;
+import fuzs.puzzleslib.common.api.client.core.v1.context.BuiltInBlockModelsContext;
+import fuzs.puzzleslib.common.api.client.core.v1.context.LayerDefinitionsContext;
+import fuzs.puzzleslib.common.api.client.core.v1.context.MenuScreensContext;
+import fuzs.puzzleslib.common.api.client.gui.v2.tooltip.ItemTooltipRegistry;
 import net.minecraft.client.model.object.chest.ChestModel;
+import net.minecraft.client.renderer.block.BuiltInBlockModels;
+import net.minecraft.client.renderer.block.model.ConditionalBlockModel;
+import net.minecraft.client.renderer.block.model.properties.conditional.IsXmas;
 import net.minecraft.client.renderer.special.ChestSpecialRenderer;
+import net.minecraft.core.Direction;
+import net.minecraft.resources.Identifier;
+import net.minecraft.world.level.block.ChestBlock;
+import net.minecraft.world.level.block.state.properties.ChestType;
+
+import java.util.Optional;
 
 public class NetherChestedClient implements ClientModConstructor {
 
@@ -39,8 +48,22 @@ public class NetherChestedClient implements ClientModConstructor {
     }
 
     @Override
-    public void onRegisterSpecialBlockModelRenderers(SpecialBlockModelRenderersContext context) {
-        context.registerSpecialBlockModelRenderer(ModRegistry.NETHER_CHEST_BLOCK.value(),
-                new ChestSpecialRenderer.Unbaked(NetherChestRenderer.NETHER_CHEST_TEXTURE));
+    public void onRegisterBuiltInBlockModels(BuiltInBlockModelsContext context) {
+        context.registerModelFactory(ModRegistry.NETHER_CHEST_BLOCK.value(),
+                createXmasChest(NetherChestRenderer.NETHER_CHEST_TEXTURE));
+    }
+
+    /**
+     * TODO replace with Puzzles Lib method
+     */
+    @Deprecated
+    public static BuiltInBlockModels.SpecialModelFactory createXmasChest(Identifier texture) {
+        return BuiltInBlockModels.specialModelWithPropertyDispatch(ChestBlock.FACING,
+                (Direction facing) -> new ConditionalBlockModel.Unbaked(Optional.empty(),
+                        new IsXmas(),
+                        BuiltInBlockModels.createChest(ChestSpecialRenderer.CHRISTMAS.single(),
+                                ChestType.SINGLE,
+                                facing),
+                        BuiltInBlockModels.createChest(texture, ChestType.SINGLE, facing)));
     }
 }

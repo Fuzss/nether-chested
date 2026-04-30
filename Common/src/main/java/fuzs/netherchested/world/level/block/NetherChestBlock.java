@@ -1,13 +1,13 @@
 package fuzs.netherchested.world.level.block;
 
 import com.mojang.serialization.MapCodec;
-import fuzs.limitlesscontainers.api.limitlesscontainers.v1.LimitlessContainerUtils;
+import fuzs.limitlesscontainers.common.api.limitlesscontainers.v1.LimitlessContainerUtils;
 import fuzs.netherchested.NetherChested;
 import fuzs.netherchested.config.ServerConfig;
 import fuzs.netherchested.init.ModRegistry;
 import fuzs.netherchested.world.level.block.entity.NetherChestBlockEntity;
-import fuzs.puzzleslib.api.block.v1.entity.TickingEntityBlock;
-import fuzs.puzzleslib.api.util.v1.InteractionResultHelper;
+import fuzs.puzzleslib.common.api.block.v1.entity.TickingEntityBlock;
+import fuzs.puzzleslib.common.api.util.v1.InteractionResultHelper;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;

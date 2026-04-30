@@ -4,7 +4,7 @@ import fuzs.netherchested.NetherChested;
 import fuzs.netherchested.world.inventory.NetherChestMenu;
 import fuzs.netherchested.world.level.block.NetherChestBlock;
 import fuzs.netherchested.world.level.block.entity.NetherChestBlockEntity;
-import fuzs.puzzleslib.api.init.v3.registry.RegistryManager;
+import fuzs.puzzleslib.common.api.init.v3.registry.RegistryManager;
 import net.minecraft.core.Holder;
 import net.minecraft.core.component.DataComponentType;
 import net.minecraft.world.inventory.MenuType;

@@ -1,30 +1,36 @@
 package fuzs.netherchested.world.level.block.entity;
 
 import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import fuzs.limitlesscontainers.api.limitlesscontainers.v1.LimitlessContainerUtils;
-import fuzs.limitlesscontainers.api.limitlesscontainers.v1.MultipliedContainer;
+import fuzs.limitlesscontainers.common.api.limitlesscontainers.v1.LimitlessContainerUtils;
+import fuzs.limitlesscontainers.common.api.limitlesscontainers.v1.MultipliedContainer;
 import fuzs.netherchested.NetherChested;
 import fuzs.netherchested.config.ServerConfig;
 import fuzs.netherchested.init.ModRegistry;
 import fuzs.netherchested.world.inventory.NetherChestMenu;
-import fuzs.puzzleslib.api.block.v1.entity.TickingBlockEntity;
-import fuzs.puzzleslib.api.container.v1.ContainerMenuHelper;
-import fuzs.puzzleslib.api.container.v1.ListBackedContainer;
+import fuzs.puzzleslib.common.api.block.v1.entity.TickingBlockEntity;
+import fuzs.puzzleslib.common.api.container.v1.ContainerMenuHelper;
+import fuzs.puzzleslib.common.api.container.v1.ListBackedContainer;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Holder;
 import net.minecraft.core.NonNullList;
 import net.minecraft.core.component.DataComponentGetter;
 import net.minecraft.core.component.DataComponentMap;
+import net.minecraft.core.component.DataComponentPatch;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.util.ExtraCodecs;
 import net.minecraft.world.entity.ContainerUser;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.ItemStackTemplate;
 import net.minecraft.world.item.component.ItemContainerContents;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.ChestLidController;
@@ -40,14 +46,34 @@ import net.minecraft.world.level.storage.ValueOutput;
  */
 public class NetherChestBlockEntity extends NamedBlockEntity implements LidBlockEntity, TickingBlockEntity {
     /**
+     * TODO replace with instance from updated library
+     *
+     * @see ItemStackTemplate#MAP_CODEC
+     */
+    @Deprecated
+    public static final MapCodec<ItemStackTemplate> ITEM_STACK_TEMPLATE_MAP_CODEC = RecordCodecBuilder.mapCodec((RecordCodecBuilder.Instance<ItemStackTemplate> instance) -> instance.group(
+            Item.CODEC.fieldOf("id").forGetter(ItemStackTemplate::item),
+            ExtraCodecs.POSITIVE_INT.optionalFieldOf("count", 1).forGetter(ItemStackTemplate::count),
+            DataComponentPatch.CODEC.optionalFieldOf("components", DataComponentPatch.EMPTY)
+                    .forGetter(ItemStackTemplate::components)).apply(instance, ItemStackTemplate::new));
+    /**
+     * TODO replace with instance from updated library
+     *
+     * @see ItemStackTemplate#CODEC
+     */
+    @Deprecated
+    public static final Codec<ItemStackTemplate> ITEM_STACK_TEMPLATE_CODEC = Codec.withAlternative(
+            ITEM_STACK_TEMPLATE_MAP_CODEC.codec(),
+            Item.CODEC,
+            (Holder<Item> item) -> new ItemStackTemplate(item.value()));
+    /**
      * @see ItemContainerContents.Slot#CODEC
      */
     public static final Codec<ItemContainerContents.Slot> ITEM_CONTAINER_CONTENTS_SLOT_CODEC = RecordCodecBuilder.create(
             instance -> instance.group(Codec.intRange(0, 255)
                                     .fieldOf("slot")
                                     .forGetter(ItemContainerContents.Slot::index),
-                            LimitlessContainerUtils.ITEM_STACK_CODEC.fieldOf("item")
-                                    .forGetter(ItemContainerContents.Slot::item))
+                            ITEM_STACK_TEMPLATE_CODEC.fieldOf("item").forGetter(ItemContainerContents.Slot::item))
                     .apply(instance, ItemContainerContents.Slot::new));
     /**
      * @see ItemContainerContents#CODEC
@@ -67,7 +93,7 @@ public class NetherChestBlockEntity extends NamedBlockEntity implements LidBlock
     }
 
     @Override
-    public void clientTick() {
+    public void clientTick(Level level, BlockPos blockPos, BlockState blockState) {
         this.chestLidController.tickLid();
     }
 
@@ -202,7 +228,7 @@ public class NetherChestBlockEntity extends NamedBlockEntity implements LidBlock
                     SoundEvents.ENDER_CHEST_OPEN,
                     SoundSource.BLOCKS,
                     0.5F,
-                    level.random.nextFloat() * 0.1F + 0.9F);
+                    level.getRandom().nextFloat() * 0.1F + 0.9F);
         }
 
         @Override
@@ -214,7 +240,7 @@ public class NetherChestBlockEntity extends NamedBlockEntity implements LidBlock
                     SoundEvents.ENDER_CHEST_CLOSE,
                     SoundSource.BLOCKS,
                     0.5F,
-                    level.random.nextFloat() * 0.1F + 0.9F);
+                    level.getRandom().nextFloat() * 0.1F + 0.9F);
         }
 
         @Override

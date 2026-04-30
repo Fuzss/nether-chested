@@ -1,8 +1,8 @@
 package fuzs.netherchested.data;
 
 import fuzs.netherchested.init.ModRegistry;
-import fuzs.puzzleslib.api.data.v2.AbstractLootProvider;
-import fuzs.puzzleslib.api.data.v2.core.DataProviderContext;
+import fuzs.puzzleslib.common.api.data.v2.AbstractLootProvider;
+import fuzs.puzzleslib.common.api.data.v2.core.DataProviderContext;
 
 public class ModBlockLootProvider extends AbstractLootProvider.Blocks {
 

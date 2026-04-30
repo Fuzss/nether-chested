@@ -1,9 +1,9 @@
 package fuzs.netherchested.world.inventory;
 
-import fuzs.limitlesscontainers.api.limitlesscontainers.v1.LimitlessContainerMenu;
-import fuzs.limitlesscontainers.api.limitlesscontainers.v1.MultipliedContainer;
-import fuzs.limitlesscontainers.api.limitlesscontainers.v1.MultipliedSimpleContainer;
-import fuzs.limitlesscontainers.api.limitlesscontainers.v1.MultipliedSlot;
+import fuzs.limitlesscontainers.common.api.limitlesscontainers.v1.LimitlessContainerMenu;
+import fuzs.limitlesscontainers.common.api.limitlesscontainers.v1.MultipliedContainer;
+import fuzs.limitlesscontainers.common.api.limitlesscontainers.v1.MultipliedSimpleContainer;
+import fuzs.limitlesscontainers.common.api.limitlesscontainers.v1.MultipliedSlot;
 import fuzs.netherchested.NetherChested;
 import fuzs.netherchested.config.ServerConfig;
 import fuzs.netherchested.init.ModRegistry;
