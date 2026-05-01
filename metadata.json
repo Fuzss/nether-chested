@@ -13,14 +13,6 @@
     },
     "dependencies": [
         {
-            "name": "limitlesscontainers",
-            "type": "embedded",
-            "platforms": [
-                "fabric",
-                "neoforge"
-            ]
-        },
-        {
             "name": "fabricapi",
             "type": "required",
             "platforms": [

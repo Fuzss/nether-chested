@@ -1,0 +1,215 @@
+package fuzs.netherchested.common.world.level.block.entity;
+
+import fuzs.netherchested.common.NetherChested;
+import fuzs.netherchested.common.config.ServerConfig;
+import fuzs.netherchested.common.init.ModRegistry;
+import fuzs.netherchested.common.world.MultipliedContainer;
+import fuzs.netherchested.common.world.inventory.LimitlessContainerUtils;
+import fuzs.netherchested.common.world.inventory.NetherChestMenu;
+import fuzs.netherchested.common.world.item.component.LimitlessItemContainerContents;
+import fuzs.puzzleslib.common.api.block.v1.entity.TickingBlockEntity;
+import fuzs.puzzleslib.common.api.container.v1.ContainerMenuHelper;
+import fuzs.puzzleslib.common.api.container.v1.ListBackedContainer;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.NonNullList;
+import net.minecraft.core.component.DataComponentGetter;
+import net.minecraft.core.component.DataComponentMap;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.entity.ContainerUser;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.component.ItemContainerContents;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.ChestLidController;
+import net.minecraft.world.level.block.entity.ContainerOpenersCounter;
+import net.minecraft.world.level.block.entity.LidBlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
+
+/**
+ * Mostly a reimplementation of vanilla's {@link net.minecraft.world.level.block.entity.ChestBlockEntity}, which does
+ * not implement {@link net.minecraft.world.Container} to be able to handle item transfers ourselves on Fabric.
+ */
+public class NetherChestBlockEntity extends NamedBlockEntity implements LidBlockEntity, TickingBlockEntity {
+    public static final MutableComponent CONTAINER_TITLE = Component.translatable("container.nether_chest");
+    public static final int CONTAINER_SIZE = 54;
+
+    private final ContainerOpenersCounter openersCounter = new NetherChestOpenersCounter();
+    private final ChestLidController chestLidController = new ChestLidController();
+    private final MultipliedContainer container = new NetherChestContainer();
+    private final NonNullList<ItemStack> items = NonNullList.withSize(CONTAINER_SIZE, ItemStack.EMPTY);
+
+    public NetherChestBlockEntity(BlockPos blockPos, BlockState blockState) {
+        super(ModRegistry.NETHER_CHEST_BLOCK_ENTITY_TYPE.value(), blockPos, blockState);
+    }
+
+    @Override
+    public void clientTick(Level level, BlockPos blockPos, BlockState blockState) {
+        this.chestLidController.tickLid();
+    }
+
+    @Override
+    public float getOpenNess(float partialTicks) {
+        return this.chestLidController.getOpenness(partialTicks);
+    }
+
+    @Override
+    public boolean triggerEvent(int id, int type) {
+        if (id == 1) {
+            this.chestLidController.shouldBeOpen(type > 0);
+            return true;
+        } else {
+            return super.triggerEvent(id, type);
+        }
+    }
+
+    @Override
+    public void loadAdditional(ValueInput valueInput) {
+        super.loadAdditional(valueInput);
+        this.getItems().clear();
+        LimitlessContainerUtils.loadAllItems(valueInput, this.getItems());
+    }
+
+    @Override
+    protected void saveAdditional(ValueOutput valueOutput) {
+        super.saveAdditional(valueOutput);
+        LimitlessContainerUtils.saveAllItems(valueOutput, this.getItems());
+    }
+
+    @Override
+    public void preRemoveSideEffects(BlockPos blockPos, BlockState blockState) {
+        if (this.level != null) {
+            LimitlessContainerUtils.dropContents(this.level, blockPos, this.container);
+        }
+    }
+
+    @Override
+    protected void applyImplicitComponents(DataComponentGetter componentGetter) {
+        super.applyImplicitComponents(componentGetter);
+        this.getItems().clear();
+        componentGetter.getOrDefault(ModRegistry.UNLIMITED_CONTAINER_DATA_COMPONENT_TYPE.value(),
+                ItemContainerContents.EMPTY).copyInto(this.getItems());
+    }
+
+    @Override
+    protected void collectImplicitComponents(DataComponentMap.Builder components) {
+        super.collectImplicitComponents(components);
+        components.set(DataComponents.CONTAINER, null);
+        components.set(ModRegistry.UNLIMITED_CONTAINER_DATA_COMPONENT_TYPE.value(),
+                LimitlessItemContainerContents.fromItems(this.getItems()));
+    }
+
+    @Override
+    protected Component getDefaultName() {
+        return CONTAINER_TITLE;
+    }
+
+    @Override
+    protected NonNullList<ItemStack> getItems() {
+        return this.items;
+    }
+
+    @Override
+    protected void setItems(NonNullList<ItemStack> items) {
+        ContainerMenuHelper.copyItemsIntoList(items, this.getItems());
+    }
+
+    @Override
+    protected AbstractContainerMenu createMenu(int containerId, Inventory inventory) {
+        return new NetherChestMenu(containerId, inventory, this.container);
+    }
+
+    public void recheckOpen() {
+        if (!this.remove) {
+            this.openersCounter.recheckOpeners(this.getLevel(), this.getBlockPos(), this.getBlockState());
+        }
+    }
+
+    public MultipliedContainer getContainer() {
+        return this.container;
+    }
+
+    private class NetherChestContainer implements ListBackedContainer, MultipliedContainer {
+
+        @Override
+        public NonNullList<ItemStack> getContainerItems() {
+            return NetherChestBlockEntity.this.getItems();
+        }
+
+        @Override
+        public void setChanged() {
+            NetherChestBlockEntity.this.setChanged();
+        }
+
+        @Override
+        public void startOpen(ContainerUser containerUser) {
+            if (!NetherChestBlockEntity.this.remove && !containerUser.getLivingEntity().isSpectator()) {
+                NetherChestBlockEntity.this.openersCounter.incrementOpeners(containerUser.getLivingEntity(),
+                        NetherChestBlockEntity.this.getLevel(),
+                        NetherChestBlockEntity.this.getBlockPos(),
+                        NetherChestBlockEntity.this.getBlockState(),
+                        containerUser.getContainerInteractionRange());
+            }
+        }
+
+        @Override
+        public void stopOpen(ContainerUser containerUser) {
+            if (!NetherChestBlockEntity.this.remove && !containerUser.getLivingEntity().isSpectator()) {
+                NetherChestBlockEntity.this.openersCounter.decrementOpeners(containerUser.getLivingEntity(),
+                        NetherChestBlockEntity.this.getLevel(),
+                        NetherChestBlockEntity.this.getBlockPos(),
+                        NetherChestBlockEntity.this.getBlockState());
+            }
+        }
+
+        @Override
+        public int getStackSizeMultiplier() {
+            return NetherChested.CONFIG.get(ServerConfig.class).stackSizeMultiplier;
+        }
+    }
+
+    private class NetherChestOpenersCounter extends ContainerOpenersCounter {
+
+        @Override
+        protected void onOpen(Level level, BlockPos pos, BlockState state) {
+            level.playSound(null,
+                    (double) pos.getX() + 0.5,
+                    (double) pos.getY() + 0.5,
+                    (double) pos.getZ() + 0.5,
+                    SoundEvents.ENDER_CHEST_OPEN,
+                    SoundSource.BLOCKS,
+                    0.5F,
+                    level.getRandom().nextFloat() * 0.1F + 0.9F);
+        }
+
+        @Override
+        protected void onClose(Level level, BlockPos pos, BlockState state) {
+            level.playSound(null,
+                    (double) pos.getX() + 0.5,
+                    (double) pos.getY() + 0.5,
+                    (double) pos.getZ() + 0.5,
+                    SoundEvents.ENDER_CHEST_CLOSE,
+                    SoundSource.BLOCKS,
+                    0.5F,
+                    level.getRandom().nextFloat() * 0.1F + 0.9F);
+        }
+
+        @Override
+        protected void openerCountChanged(Level level, BlockPos pos, BlockState state, int count, int openCount) {
+            level.blockEvent(pos, state.getBlock(), 1, openCount);
+        }
+
+        @Override
+        public boolean isOwnContainer(Player player) {
+            return player.containerMenu instanceof NetherChestMenu netherChestMenu && netherChestMenu.is(
+                    NetherChestBlockEntity.this.container);
+        }
+    }
+}

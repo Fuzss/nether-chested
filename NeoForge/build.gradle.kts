@@ -4,6 +4,4 @@ plugins {
 
 dependencies {
     modApi(sharedLibs.puzzleslib.neoforge)
-    modApi(sharedLibs.limitlesscontainers.neoforge)
-    include(sharedLibs.limitlesscontainers.neoforge)
 }

@@ -1,9 +1,8 @@
 package fuzs.netherchested.fabric;
 
-import fuzs.limitlesscontainers.fabric.api.limitlesscontainers.v1.LimitlessSlotStorage;
-import fuzs.netherchested.NetherChested;
-import fuzs.netherchested.init.ModRegistry;
-import fuzs.netherchested.world.level.block.entity.NetherChestBlockEntity;
+import fuzs.netherchested.common.NetherChested;
+import fuzs.netherchested.common.init.ModRegistry;
+import fuzs.netherchested.common.world.level.block.entity.NetherChestBlockEntity;
 import fuzs.puzzleslib.common.api.core.v1.ModConstructor;
 import net.fabricmc.api.ModInitializer;
 

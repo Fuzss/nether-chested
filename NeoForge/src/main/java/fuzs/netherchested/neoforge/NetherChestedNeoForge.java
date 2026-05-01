@@ -1,12 +1,11 @@
 package fuzs.netherchested.neoforge;
 
-import fuzs.limitlesscontainers.neoforge.api.limitlesscontainers.v2.LimitlessSlotResourceHandler;
-import fuzs.netherchested.NetherChested;
-import fuzs.netherchested.data.ModBlockLootProvider;
-import fuzs.netherchested.data.ModBlockTagProvider;
-import fuzs.netherchested.data.ModRecipeProvider;
-import fuzs.netherchested.init.ModRegistry;
-import fuzs.netherchested.world.level.block.entity.NetherChestBlockEntity;
+import fuzs.netherchested.common.NetherChested;
+import fuzs.netherchested.common.data.ModBlockLootProvider;
+import fuzs.netherchested.common.data.ModBlockTagProvider;
+import fuzs.netherchested.common.data.ModRecipeProvider;
+import fuzs.netherchested.common.init.ModRegistry;
+import fuzs.netherchested.common.world.level.block.entity.NetherChestBlockEntity;
 import fuzs.puzzleslib.common.api.core.v1.ModConstructor;
 import fuzs.puzzleslib.neoforge.api.data.v2.core.DataProviderHelper;
 import net.neoforged.fml.common.Mod;
