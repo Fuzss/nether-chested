@@ -19,12 +19,12 @@ public class NetherChestScreen extends LimitlessContainerScreen<NetherChestMenu>
 
     @Override
     protected void extractLabels(GuiGraphicsExtractor guiGraphics, int mouseX, int mouseY) {
-        guiGraphics.text(this.font, this.title, this.titleLabelX, this.titleLabelY, 0xCFCFCF, false);
+        guiGraphics.text(this.font, this.title, this.titleLabelX, this.titleLabelY, 0xFFCFCFCF, false);
         guiGraphics.text(this.font,
                 this.playerInventoryTitle,
                 this.inventoryLabelX,
                 this.inventoryLabelY,
-                0x404040,
+                0xFF404040,
                 false);
     }
 
