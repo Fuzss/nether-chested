@@ -38,13 +38,14 @@ public abstract class LimitlessContainerScreen<T extends AbstractContainerMenu> 
     }
 
     @Override
-    public void extractFloatingItem(GuiGraphicsExtractor guiGraphics, ItemStack carried, int x, int y, @Nullable String itemCount) {
-        guiGraphics.item(carried, x, y);
-        AdvancedItemRenderer.itemDecorations(guiGraphics, this.font, carried, x, y, itemCount);
+    public void extractFloatingItem(GuiGraphicsExtractor graphics, ItemStack carried, int x, int y, @Nullable String itemCount) {
+        graphics.item(carried, x, y);
+//        graphics.itemDecorations(this.font, carried, x, y, itemCount);
+        AdvancedItemRenderer.itemDecorations(graphics, this.font, carried, x, y, itemCount);
     }
 
     @Override
-    public void extractSlot(GuiGraphicsExtractor guiGraphics, Slot slot, int mouseX, int mouseY) {
+    public void extractSlot(GuiGraphicsExtractor graphics, Slot slot, int mouseX, int mouseY) {
         int x = slot.x;
         int y = slot.y;
         ItemStack itemStack = slot.getItem();
@@ -57,11 +58,15 @@ public abstract class LimitlessContainerScreen<T extends AbstractContainerMenu> 
                 return;
             }
 
+//            if (AbstractContainerMenu.canItemQuickReplace(slot, carried, true) && this.menu.canDragTo(slot)) {
             if (LimitlessContainerUtils.canItemQuickReplace(slot, carried, true) && this.menu.canDragTo(slot)) {
                 quickCraftStack = true;
 //                int maxSize = Math.min(carried.getMaxStackSize(), slot.getMaxStackSize(carried));
                 int maxSize = slot.getMaxStackSize(carried);
                 int carry = slot.getItem().isEmpty() ? 0 : slot.getItem().getCount();
+//                int newCount = AbstractContainerMenu.getQuickCraftPlaceCount(this.quickCraftSlots.size(),
+//                        this.quickCraftingType,
+//                        carried) + carry;
                 int newCount = LimitlessContainerUtils.getQuickCraftPlaceCount(this.quickCraftSlots,
                         this.quickCraftingType,
                         carried,
@@ -74,6 +79,7 @@ public abstract class LimitlessContainerScreen<T extends AbstractContainerMenu> 
                 itemStack = carried.copyWithCount(newCount);
             } else {
                 this.quickCraftSlots.remove(slot);
+//                this.recalculateQuickCraftRemaining();
                 this.recalculateQuickCraftRemaining(slot);
             }
         }
@@ -81,24 +87,25 @@ public abstract class LimitlessContainerScreen<T extends AbstractContainerMenu> 
         if (itemStack.isEmpty() && slot.isActive()) {
             Identifier identifier = slot.getNoItemIcon();
             if (identifier != null) {
-                guiGraphics.blitSprite(RenderPipelines.GUI_TEXTURED, identifier, x, y, 16, 16);
+                graphics.blitSprite(RenderPipelines.GUI_TEXTURED, identifier, x, y, 16, 16);
                 done = true;
             }
         }
 
         if (!done) {
             if (quickCraftStack) {
-                guiGraphics.fill(x, y, x + 16, y + 16, -2130706433);
+                graphics.fill(x, y, x + 16, y + 16, -2130706433);
             }
 
             int seed = slot.x + slot.y * this.imageWidth;
             if (slot.isFake()) {
-                guiGraphics.fakeItem(itemStack, x, y, seed);
+                graphics.fakeItem(itemStack, x, y, seed);
             } else {
-                guiGraphics.item(itemStack, x, y, seed);
+                graphics.item(itemStack, x, y, seed);
             }
 
-            AdvancedItemRenderer.itemDecorations(guiGraphics, this.font, itemStack, x, y, itemCount);
+//            graphics.itemDecorations(this.font, itemStack, x, y, itemCount);
+            AdvancedItemRenderer.itemDecorations(graphics, this.font, itemStack, x, y, itemCount);
         }
     }
 
@@ -106,20 +113,24 @@ public abstract class LimitlessContainerScreen<T extends AbstractContainerMenu> 
      * @see AbstractContainerScreen#recalculateQuickCraftRemaining()
      */
     private void recalculateQuickCraftRemaining(Slot slot) {
-        ItemStack itemStack = this.menu.getCarried();
-        if (!itemStack.isEmpty() && this.isQuickCrafting) {
+        ItemStack carried = this.menu.getCarried();
+        if (!carried.isEmpty() && this.isQuickCrafting) {
             if (this.quickCraftingType == 2) {
-                this.quickCraftingRemainder = slot.getMaxStackSize(itemStack);
+//                this.quickCraftingRemainder = carried.getMaxStackSize();
+                this.quickCraftingRemainder = slot.getMaxStackSize(carried);
             } else {
-                this.quickCraftingRemainder = itemStack.getCount();
-
+                this.quickCraftingRemainder = carried.getCount();
                 for (Slot quickCraftSlot : this.quickCraftSlots) {
-                    ItemStack itemStack2 = quickCraftSlot.getItem();
-                    int carry = itemStack2.isEmpty() ? 0 : itemStack2.getCount();
-                    int maxSize = Math.min(itemStack.getMaxStackSize(), quickCraftSlot.getMaxStackSize(itemStack));
+                    ItemStack slotItemStack = quickCraftSlot.getItem();
+                    int carry = slotItemStack.isEmpty() ? 0 : slotItemStack.getCount();
+//                    int maxSize = Math.min(carried.getMaxStackSize(), slot.getMaxStackSize(carried));
+                    int maxSize = Math.min(slot.getMaxStackSize(carried), quickCraftSlot.getMaxStackSize(carried));
+//                    int newCount = Math.min(AbstractContainerMenu.getQuickCraftPlaceCount(this.quickCraftSlots.size(),
+//                            this.quickCraftingType,
+//                            carried) + carry, maxSize);
                     int newCount = Math.min(LimitlessContainerUtils.getQuickCraftPlaceCount(this.quickCraftSlots,
                             this.quickCraftingType,
-                            itemStack,
+                            carried,
                             quickCraftSlot) + carry, maxSize);
                     this.quickCraftingRemainder -= newCount - carry;
                 }
@@ -128,11 +139,24 @@ public abstract class LimitlessContainerScreen<T extends AbstractContainerMenu> 
     }
 
     @Override
-    public boolean mouseReleased(MouseButtonEvent mouseButtonEvent) {
-        Slot slot = this.getHoveredSlot(mouseButtonEvent.x(), mouseButtonEvent.y());
+    public boolean mouseDragged(MouseButtonEvent event, double dx, double dy) {
+        Slot slot = this.getHoveredSlot(event.x(), event.y());
+        ItemStack carried = this.menu.getCarried();
+        if (slot != null && this.shouldAddSlotToQuickCraft(slot, carried) && this.quickCraftSlots.add(slot)) {
+//            this.recalculateQuickCraftRemaining();
+            this.recalculateQuickCraftRemaining(slot);
+            return true;
+        } else {
+            return slot == null && this.menu.getCarried().isEmpty() ? super.mouseDragged(event, dx, dy) : true;
+        }
+    }
+
+    @Override
+    public boolean mouseReleased(MouseButtonEvent event) {
+        Slot slot = this.getHoveredSlot(event.x(), event.y());
         int xo = this.leftPos;
         int yo = this.topPos;
-        boolean clickedOutside = this.hasClickedOutside(mouseButtonEvent.x(), mouseButtonEvent.y(), xo, yo);
+        boolean clickedOutside = this.hasClickedOutside(event.x(), event.y(), xo, yo);
         int slotId = -1;
         if (slot != null) {
             slotId = slot.index;
@@ -142,28 +166,32 @@ public abstract class LimitlessContainerScreen<T extends AbstractContainerMenu> 
             slotId = -999;
         }
 
-        if (this.doubleclick && slot != null && mouseButtonEvent.button() == 0 && this.menu.canTakeItemForPickAll(
-                ItemStack.EMPTY,
+        if (this.doubleclick && slot != null && event.button() == 0 && this.menu.canTakeItemForPickAll(ItemStack.EMPTY,
                 slot)) {
-            if (mouseButtonEvent.hasShiftDown()) {
+            if (event.hasShiftDown()) {
                 if (!this.lastQuickMoved.isEmpty()) {
-                    for (Slot slot2 : this.menu.slots) {
-                        if (slot2 != null && slot2.mayPickup(this.minecraft.player) && slot2.hasItem()
-                                && slot2.container == slot.container && LimitlessContainerUtils.canItemQuickReplace(
-                                slot2,
+                    for (Slot target : this.menu.slots) {
+//                        if (target != null && target.mayPickup(this.minecraft.player) && target.hasItem()
+//                                && target.container == slot.container && AbstractContainerMenu.canItemQuickReplace(
+//                                target,
+//                                this.lastQuickMoved,
+//                                true)) {
+                        if (target != null && target.mayPickup(this.minecraft.player) && target.hasItem()
+                                && target.container == slot.container && LimitlessContainerUtils.canItemQuickReplace(
+                                target,
                                 this.lastQuickMoved,
                                 true)) {
-                            this.slotClicked(slot2, slot2.index, mouseButtonEvent.button(), ContainerInput.QUICK_MOVE);
+                            this.slotClicked(target, target.index, event.button(), ContainerInput.QUICK_MOVE);
                         }
                     }
                 }
             } else {
-                this.slotClicked(slot, slotId, mouseButtonEvent.button(), ContainerInput.PICKUP_ALL);
+                this.slotClicked(slot, slotId, event.button(), ContainerInput.PICKUP_ALL);
             }
 
             this.doubleclick = false;
         } else {
-            if (this.isQuickCrafting && this.quickCraftingButton != mouseButtonEvent.button()) {
+            if (this.isQuickCrafting && this.quickCraftingButton != event.button()) {
                 this.isQuickCrafting = false;
                 this.quickCraftSlots.clear();
                 this.skipNextRelease = true;
@@ -178,17 +206,17 @@ public abstract class LimitlessContainerScreen<T extends AbstractContainerMenu> 
             if (this.isQuickCrafting && !this.quickCraftSlots.isEmpty()) {
                 this.quickCraftToSlots();
             } else if (!this.menu.getCarried().isEmpty()) {
-                if (this.minecraft.options.keyPickItem.matchesMouse(mouseButtonEvent)) {
-                    this.slotClicked(slot, slotId, mouseButtonEvent.button(), ContainerInput.CLONE);
+                if (this.minecraft.options.keyPickItem.matchesMouse(event)) {
+                    this.slotClicked(slot, slotId, event.button(), ContainerInput.CLONE);
                 } else {
-                    boolean quickKey = slotId != -999 && mouseButtonEvent.hasShiftDown();
+                    boolean quickKey = slotId != -999 && event.hasShiftDown();
                     if (quickKey) {
                         this.lastQuickMoved = slot != null && slot.hasItem() ? slot.getItem().copy() : ItemStack.EMPTY;
                     }
 
                     this.slotClicked(slot,
                             slotId,
-                            mouseButtonEvent.button(),
+                            event.button(),
                             quickKey ? ContainerInput.QUICK_MOVE : ContainerInput.PICKUP);
                 }
             }
@@ -200,6 +228,9 @@ public abstract class LimitlessContainerScreen<T extends AbstractContainerMenu> 
 
     @Override
     public boolean shouldAddSlotToQuickCraft(Slot slot, ItemStack carried) {
+//        return this.isQuickCrafting && !carried.isEmpty() && (carried.getCount() > this.quickCraftSlots.size()
+//                || this.quickCraftingType == 2) && AbstractContainerMenu.canItemQuickReplace(slot, carried, true)
+//                && slot.mayPlace(carried) && this.menu.canDragTo(slot);
         return this.isQuickCrafting && !carried.isEmpty() && (carried.getCount() > this.quickCraftSlots.size()
                 || this.quickCraftingType == 2) && LimitlessContainerUtils.canItemQuickReplace(slot, carried, true)
                 && slot.mayPlace(carried) && this.menu.canDragTo(slot);
