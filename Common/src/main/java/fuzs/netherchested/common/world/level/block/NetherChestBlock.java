@@ -26,6 +26,7 @@ import net.minecraft.world.level.block.entity.BlockEntityTicker;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.Vec3;
 import org.jspecify.annotations.Nullable;
 
 public class NetherChestBlock extends EnderChestBlock implements TickingEntityBlock<NetherChestBlockEntity> {
@@ -71,10 +72,11 @@ public class NetherChestBlock extends EnderChestBlock implements TickingEntityBl
             if (level.dimension() == Level.NETHER
                     && NetherChested.CONFIG.get(ServerConfig.class).netherExplosionStrength > 0) {
                 level.removeBlock(pos, false);
+                Vec3 boomPos = Vec3.atCenterOf(pos);
                 level.explode(null,
-                        level.damageSources().badRespawnPointExplosion(pos.getCenter()),
+                        level.damageSources().badRespawnPointExplosion(boomPos),
                         null,
-                        pos.getCenter(),
+                        boomPos,
                         NetherChested.CONFIG.get(ServerConfig.class).netherExplosionStrength,
                         true,
                         Level.ExplosionInteraction.BLOCK);

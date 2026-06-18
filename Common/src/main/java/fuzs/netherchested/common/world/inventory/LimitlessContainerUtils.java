@@ -16,7 +16,7 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.Container;
 import net.minecraft.world.ItemStackWithSlot;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.EntityTypes;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
@@ -116,7 +116,7 @@ public final class LimitlessContainerUtils {
      * @see net.minecraft.world.Containers#dropItemStack(Level, double, double, double, ItemStack)
      */
     public static void dropItemStack(Level level, double x, double y, double z, ItemStack itemStack) {
-        double d = EntityType.ITEM.getWidth();
+        double d = EntityTypes.ITEM.getWidth();
         double e = 1.0 - d;
         double f = d / 2.0;
         double g = Math.floor(x) + level.getRandom().nextDouble() * e + f;

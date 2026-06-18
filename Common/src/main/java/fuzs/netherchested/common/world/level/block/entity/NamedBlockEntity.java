@@ -21,6 +21,7 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
+import net.minecraft.world.phys.Vec3;
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -82,7 +83,7 @@ public abstract class NamedBlockEntity extends BlockEntity implements MenuProvid
         if (this.canOpen(player)) {
             return this.createMenu(i, inventory);
         } else {
-            BaseContainerBlockEntity.sendChestLockedNotifications(this.getBlockPos().getCenter(),
+            BaseContainerBlockEntity.sendChestLockedNotifications(Vec3.atCenterOf(this.getBlockPos()),
                     player,
                     this.getDisplayName());
             return null;
