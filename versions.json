@@ -6,11 +6,17 @@
     "26.1.x": "maintained",
     "26.2.x": "primary"
   },
-  "properties": {
-    "distributions.curseforge.id": "857971",
-    "distributions.curseforge.slug": "nether-chested",
-    "distributions.github.slug": "nether-chested",
-    "distributions.modrinth.id": "bHJp2GRg",
-    "distributions.modrinth.slug": "nether-chested"
+  "distributions": {
+    "curseforge": {
+      "id": "857971",
+      "slug": "nether-chested"
+    },
+    "github": {
+      "slug": "nether-chested"
+    },
+    "modrinth": {
+      "id": "bHJp2GRg",
+      "slug": "nether-chested"
+    }
   }
 }
