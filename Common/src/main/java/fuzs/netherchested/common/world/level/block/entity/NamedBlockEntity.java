@@ -70,6 +70,13 @@ public abstract class NamedBlockEntity extends BlockEntity implements MenuProvid
 
     protected abstract Component getDefaultName();
 
+    /**
+     * @see net.minecraft.world.level.block.entity.BaseContainerBlockEntity#isLocked()
+     */
+    public boolean isLocked() {
+        return !this.lockKey.equals(LockCode.NO_LOCK);
+    }
+
     public boolean canOpen(Player player) {
         return this.lockKey.canUnlock(player);
     }
