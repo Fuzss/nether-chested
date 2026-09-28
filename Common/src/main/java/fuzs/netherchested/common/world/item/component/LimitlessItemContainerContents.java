@@ -91,7 +91,7 @@ public final class LimitlessItemContainerContents extends ItemContainerContents 
     }
 
     @Override
-    public Stream<ItemStack> allItemsCopyStream() {
+    public Stream<ItemStack> itemCopies() {
         return this.items.stream().map((Optional<ItemStackTemplate> optional) -> {
             return optional.map(this::createFromTemplate).orElse(ItemStack.EMPTY);
         });

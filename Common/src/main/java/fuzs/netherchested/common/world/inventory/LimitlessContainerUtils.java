@@ -13,6 +13,7 @@ import net.minecraft.core.component.DataComponentPatch;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.ExtraCodecs;
 import net.minecraft.util.Mth;
+import net.minecraft.util.Prediction;
 import net.minecraft.world.Container;
 import net.minecraft.world.ItemStackWithSlot;
 import net.minecraft.world.entity.Entity;
@@ -219,24 +220,24 @@ public final class LimitlessContainerUtils {
     }
 
     /**
-     * @see Inventory#placeItemBackInInventory(ItemStack)
+     * @see Inventory#placeItemBackInInventory(ItemStack, Prediction)
      */
     public static void placeItemBackInInventory(Inventory inventory, ItemStack itemStack) {
         while (itemStack.getCount() > itemStack.getMaxStackSize()) {
-            inventory.placeItemBackInInventory(itemStack.split(itemStack.getMaxStackSize()));
+            inventory.placeItemBackInInventory(itemStack.split(itemStack.getMaxStackSize()), Prediction.SERVER_ONLY);
         }
 
-        inventory.placeItemBackInInventory(itemStack);
+        inventory.placeItemBackInInventory(itemStack, Prediction.SERVER_ONLY);
     }
 
     /**
-     * @see Player#drop(ItemStack, boolean)
+     * @see net.minecraft.world.entity.LivingEntity#drop(ItemStack, boolean, Prediction)
      */
     public static void drop(Player player, ItemStack itemStack, boolean includeThrowerName) {
         while (itemStack.getCount() > itemStack.getMaxStackSize()) {
-            player.drop(itemStack.split(itemStack.getMaxStackSize()), includeThrowerName);
+            player.drop(itemStack.split(itemStack.getMaxStackSize()), includeThrowerName, Prediction.SERVER_ONLY);
         }
 
-        player.drop(itemStack, includeThrowerName);
+        player.drop(itemStack, includeThrowerName, Prediction.SERVER_ONLY);
     }
 }

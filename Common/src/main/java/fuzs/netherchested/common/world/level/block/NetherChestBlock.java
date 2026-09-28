@@ -1,6 +1,5 @@
 package fuzs.netherchested.common.world.level.block;
 
-import com.mojang.serialization.MapCodec;
 import fuzs.netherchested.common.NetherChested;
 import fuzs.netherchested.common.config.ServerConfig;
 import fuzs.netherchested.common.init.ModRegistry;
@@ -30,15 +29,9 @@ import net.minecraft.world.phys.Vec3;
 import org.jspecify.annotations.Nullable;
 
 public class NetherChestBlock extends EnderChestBlock implements TickingEntityBlock<NetherChestBlockEntity> {
-    public static final MapCodec<EnderChestBlock> CODEC = simpleCodec(NetherChestBlock::new);
 
     public NetherChestBlock(Properties properties) {
         super(properties);
-    }
-
-    @Override
-    public MapCodec<EnderChestBlock> codec() {
-        return CODEC;
     }
 
     public Component getDescriptionComponent() {

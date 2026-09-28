@@ -1,5 +1,6 @@
 package fuzs.netherchested.common.client.gui.screens.inventory;
 
+import com.mojang.blaze3d.platform.InputConstants;
 import fuzs.netherchested.common.client.gui.AdvancedItemRenderer;
 import fuzs.netherchested.common.world.inventory.LimitlessContainerUtils;
 import net.minecraft.ChatFormatting;
@@ -166,8 +167,8 @@ public abstract class LimitlessContainerScreen<T extends AbstractContainerMenu> 
             slotId = -999;
         }
 
-        if (this.doubleclick && slot != null && event.button() == 0 && this.menu.canTakeItemForPickAll(ItemStack.EMPTY,
-                slot)) {
+        if (this.doubleclick && slot != null && event.button() == InputConstants.MOUSE_BUTTON_LEFT
+                && this.menu.canTakeItemForPickAll(ItemStack.EMPTY, slot)) {
             if (event.hasShiftDown()) {
                 if (!this.lastQuickMoved.isEmpty()) {
                     for (Slot target : this.menu.slots) {
@@ -181,12 +182,12 @@ public abstract class LimitlessContainerScreen<T extends AbstractContainerMenu> 
                                 target,
                                 this.lastQuickMoved,
                                 true)) {
-                            this.slotClicked(target, target.index, event.button(), ContainerInput.QUICK_MOVE);
+                            this.slotClicked(target, target.index, event, ContainerInput.QUICK_MOVE);
                         }
                     }
                 }
             } else {
-                this.slotClicked(slot, slotId, event.button(), ContainerInput.PICKUP_ALL);
+                this.slotClicked(slot, slotId, event, ContainerInput.PICKUP_ALL);
             }
 
             this.doubleclick = false;
@@ -207,23 +208,21 @@ public abstract class LimitlessContainerScreen<T extends AbstractContainerMenu> 
                 this.quickCraftToSlots();
             } else if (!this.menu.getCarried().isEmpty()) {
                 if (this.minecraft.options.keyPickItem.matchesMouse(event)) {
-                    this.slotClicked(slot, slotId, event.button(), ContainerInput.CLONE);
+                    this.slotClicked(slot, slotId, event, ContainerInput.CLONE);
                 } else {
                     boolean quickKey = slotId != -999 && event.hasShiftDown();
                     if (quickKey) {
                         this.lastQuickMoved = slot != null && slot.hasItem() ? slot.getItem().copy() : ItemStack.EMPTY;
                     }
 
-                    this.slotClicked(slot,
-                            slotId,
-                            event.button(),
-                            quickKey ? ContainerInput.QUICK_MOVE : ContainerInput.PICKUP);
+                    this.slotClicked(slot, slotId, event, quickKey ? ContainerInput.QUICK_MOVE : ContainerInput.PICKUP);
                 }
             }
         }
 
         this.isQuickCrafting = false;
-        return true;
+//        return super.mouseReleased(event);
+        return false;
     }
 
     @Override
