@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "netherchested:nether_chest"
+        "recipes": "netherchested:nether_chest"
       },
       "trigger": "minecraft:recipe_unlocked"
     }
